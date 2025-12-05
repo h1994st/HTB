@@ -1,0 +1,6 @@
+brew "nmap"
+brew "ffuf"
+brew "hydra"
+brew "sshpass"
+brew "uv"
+brew "ike-scan"
