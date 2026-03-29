@@ -17,3 +17,5 @@ impacket~=0.13.0
 certipy-ad~=5.0.4
 bloodhound~=1.9.0
 bloodyAD~=2.5.4
+fonttools==4.60.1
+flask-unsign
