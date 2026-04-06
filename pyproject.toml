@@ -1,7 +1,7 @@
 [project]
 name = "HTB"
 version = "0.1.0"
-description = "Add your description here"
+description = "HTB writeups and tools"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
