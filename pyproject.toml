@@ -27,6 +27,7 @@ dependencies = [
     "pyaescrypt>=6.1.1",
     "pypykatz>=0.6.13",
     "rich>=14.3.4",
+    "setuptools==81.0.0",
     "sh>=2.2.2",
     "tqdm>=4.67.3",
     "yarl>=1.23.0",
