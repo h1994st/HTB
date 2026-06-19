@@ -884,6 +884,7 @@ dependencies = [
     { name = "setuptools" },
     { name = "sh" },
     { name = "tqdm" },
+    { name = "urllib3" },
     { name = "yarl" },
 ]
 
@@ -918,6 +919,7 @@ requires-dist = [
     { name = "setuptools", specifier = "==81.0.0" },
     { name = "sh", specifier = ">=2.2.2" },
     { name = "tqdm", specifier = ">=4.67.3" },
+    { name = "urllib3", specifier = ">=2.6.3" },
     { name = "yarl", specifier = ">=1.23.0" },
 ]
 
