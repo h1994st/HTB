@@ -37,5 +37,6 @@ dependencies = [
     "sh>=2.2.2",
     "tqdm>=4.67.3",
     "urllib3>=2.6.3",
+    "websockets>=17.0.1",
     "yarl>=1.23.0",
 ]

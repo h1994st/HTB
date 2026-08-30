@@ -1,0 +1,25 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
+  "permissions": {
+    "allow": [
+      "Bash(uv add *)",
+      "Bash(uv run python *)",
+      "Bash(git commit *)",
+      "Bash(git add *)",
+      "Bash(git status)",
+      "Bash(git diff)",
+      "Bash(git log)"
+    ],
+    "deny": [
+      "Bash(git push *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(pip *)",
+      "Bash(pip3 *)"
+    ]
+  }
+}
