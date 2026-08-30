@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bootstrap a new HTB box: gitignored working directory + writeup notebook.
 
-Usage:  uv run python .claude/skills/htb-box/scripts/new_box.py BoxName [10.129.x.y]
+Usage:  uv run python .claude/skills/htb-init/scripts/new_box.py BoxName [10.129.x.y]
 
 Creates ``boxname.htb/`` (working dir, gitignored via ``*.htb/``) and
 ``BoxName.ipynb`` from the skill's four-cell template, with the box name, host,
@@ -21,7 +21,7 @@ PLACEHOLDER_IP = "10.129.0.0"
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("box", help="Machine name as HTB spells it, e.g. BlockSynergy")
+    ap.add_argument("box", help="Machine name as HTB spells it, in CamelCase")
     ap.add_argument("ip", nargs="?", default=PLACEHOLDER_IP, help="Target IP")
     ap.add_argument("--host", help="Override the vhost (default: <box>.htb, lowercased)")
     args = ap.parse_args()

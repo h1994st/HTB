@@ -14,9 +14,23 @@ A personal Hack The Box workspace. Each machine produces **two** artifacts:
 Everything volatile (scans, loot, exploit scripts, keys, flags, `notes.md`) lives in the
 working directory. The notebook is the distilled, re-runnable writeup.
 
-For the end-to-end procedure on a box, use the **`htb-box`** skill
-(`.claude/skills/htb-box/`) — it carries the recon→root workflow, the notebook
-template, and the anti-stall rules. Invoke it at the start of every box.
+## Skills
+
+Invoke **`htb`** at the start of every box — it holds the phase model and the rules of
+engagement, and dispatches to the phase skills:
+
+| Skill | Phase |
+|---|---|
+| `htb-init` | working dir + notebook bootstrap (owns the notebook template) |
+| `htb-recon` | surfaces, services, exact versions |
+| `htb-vuln-research` | exploit-path vs usage-path, primitive research |
+| `htb-foothold` | credential spray, exploitation, scriptable access |
+| `htb-enumerate` | post-foothold host sweep, per principal |
+| `htb-privesc` | lateral movement and escalation |
+| `htb-unstuck` | recovery protocol, invoked from any phase |
+| `htb-writeup` | notebook assembly and the `HTB: BoxName` commit |
+
+`.claude/agents/cve-researcher.md` is a research subagent for one component at one version.
 
 ## Commands
 
@@ -35,8 +49,8 @@ top-to-bottom from a cold kernel to both flags.
 
 ## Notebook contract
 
-Every `BoxName.ipynb` opens with the same four cells (see the skill's
-`assets/box-template.ipynb`):
+Every `BoxName.ipynb` opens with the same four cells (see
+`.claude/skills/htb-init/assets/box-template.ipynb`):
 
 1. markdown — `# BoxName` + the hackthebox.com machine URL
 2. markdown — `## Port Scanning`, the `/etc/hosts` mapping, and the raw `nmap` command
