@@ -57,16 +57,13 @@ a default:
   between each. Slower, far easier to follow and to learn from, and it lets a result from
   the first candidate re-rank the rest.
 
-**The pacing rule still binds in both modes.** These targets are single small VMs, and
-concurrent agents all probing at once will knock one over — which then manufactures false
-negatives across every branch at the same time. If fanning out:
-
-- give each agent a strict request budget, and keep the total within what one careful
-  operator would send;
-- fan out on *analysis* freely — reading source, researching primitives, reasoning over
-  already-collected loot — and serialize anything that touches the target;
-- have agents report a verdict plus its evidence, and record each in `hypotheses.md` and the
-  ledger; assign each agent's task with `owner` so the fan-out is visible.
+A fan-out does not lift the request budget — it divides it. Concurrent agents all probing
+one small VM will knock it over, and a degraded target then manufactures false negatives
+across every branch simultaneously, which is worse than testing sequentially. So: fan out
+freely on *analysis* — reading source, researching primitives, reasoning over already
+collected loot — and serialize anything that touches the target. Give each agent an explicit
+request budget, require a verdict against its own kill criterion rather than a narrative, and
+set each agent's task `owner` so the fan-out is visible.
 
 ## Closing a round
 

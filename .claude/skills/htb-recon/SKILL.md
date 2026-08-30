@@ -27,12 +27,6 @@ undiscovered.
 6. **Identity harvest.** Collect every username, email, hostname, and internal path seen
    anywhere in the above. Every one of them is a spray candidate later.
 
-## Pacing
-
-One sweep at a time, 2–4 threads. Estimate and state the request count before launching a
-wordlist; if it runs into the thousands, narrow the wordlist first. Watch for the target
-degrading and stop rather than collecting false negatives.
-
 ## Recording
 
 `ledger.md` gets a service table (port, service, exact version, auth required, notes) and a

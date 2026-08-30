@@ -86,7 +86,18 @@ principal.
 
 ### Entry conditions
 
-Invoke by precondition, not by position in a list:
+Invoke by precondition, not by position in a list. Two kinds of skill sit in this table and
+they are written to different rules:
+
+- **Method skills** — `htb-threat-model`, `htb-hypotheses`, `htb-unstuck` — carry reasoning
+  discipline that is not specific to any one phase. A principle belongs in exactly one of
+  them.
+- **Phase skills** — everything else — carry the pen-testing substance of their phase: what
+  to look for, in what order, and what it means. They apply the method, they do not re-teach
+  it. Where a phase needs a principle, it states the concrete tactic and moves on.
+
+Anything that would apply equally in three phases belongs in a method skill or in the rules
+of engagement below, not copied into each.
 
 | Skill | Invoke when | Produces |
 |---|---|---|
@@ -179,6 +190,18 @@ absence — label them provisional in `ledger.md`, because a degraded target man
 **Suspect the target, not just the approach.** Repeated stalls under light load, especially
 combined with no community first blood well after release, is evidence about the box. Say so
 early and offer parking it as a real option instead of escalating effort.
+
+**When the user drives the shell, a round-trip is the scarce resource.** The user often
+runs commands themselves and pastes output back; that is a deliberate choice — they are
+learning from the box, and short user-anchored turns bound how much work a guardrail
+interrupt destroys when it rewinds to their last message. Do not push for a handover or a
+key as a matter of course, and accept a no. Instead maximize information per round-trip:
+batch one paste-ready block that answers several questions at once; print a marker before
+each section so the paste needs no follow-up; ask for the output that discriminates between
+live candidates rather than general context; keep blocks re-runnable and independent of
+shell state, since the session may have died in between; and say what a block tests before
+sending it, so a redirect costs nothing. Failing probes cost the same as succeeding ones, so
+put the cheap candidate-killers first in the block.
 
 **Record artifacts, not just outcomes.** Every step goes into the working directory as a
 numbered, re-runnable script. Boxes get reset; anything not scripted will be retyped.

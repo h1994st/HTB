@@ -29,37 +29,20 @@ Prefer the quietest primitive that proves execution.
 For callbacks and listeners use the helpers in `common/` rather than ad-hoc servers, and
 take the attacker IP from `common.get_openvpn_utun_ip()`.
 
+Delivery is its own problem, separate from the bug. Establish which direction traffic can
+flow before designing a payload: outbound to an arbitrary port, outbound on a permitted port
+only, or no egress at all — in which case the result has to come back through the same
+channel that carried the request. Watch for transformations between you and the sink —
+URL and shell decoding, length limits, character filters, encoding conversions — and test
+the primitive against a harmless marker before wrapping a payload around it. When a payload
+must survive a hostile parser, stage it: land an encoded blob first, decode it on the target,
+then execute.
+
 ## Immediately after execution
 
 Upgrade the shell to a usable TTY (`shell_upgrade.md`), then make the access repeatable —
 a key, a helper function, or a small script that takes a command and returns its output —
 and verify it round-trips before going further.
-
-## When the user drives the shell
-
-The user often runs commands themselves and pastes the output back. **This is a deliberate
-choice, not a limitation to route around.** They are learning from the box, and short
-user-anchored turns bound how much work is lost when a guardrail interrupt forces a rewind
-to their last message. Do not push for a handover or a key as a matter of course; offer one
-only when the work genuinely needs volume, and accept a no.
-
-What this does mean is that **a round-trip is the scarce resource, so maximize information
-per round-trip** rather than minimizing round-trips:
-
-- **Batch.** Send one paste-ready block that answers several questions at once, not one
-  command at a time. A block that covers a whole checklist costs the same round-trip as a
-  single `ls`.
-- **Self-label the output.** Print a marker before each section (`echo "=== sudo ==="`) so
-  the paste is readable without a follow-up asking which output is which.
-- **Ask for the discriminating output.** Request what separates the live hypotheses, not
-  general context. If two candidates differ only in one file's permissions, ask for that.
-- **Make blocks safe to re-run and independent of shell state** — no reliance on a variable
-  set in an earlier paste, since the session may have died in between.
-- **Say what each block is testing** before sending it, so the user can redirect before
-  spending a round-trip rather than after.
-
-Failing probes cost the same round-trip as succeeding ones, so put the cheap
-hypothesis-killers first in the block.
 
 ## Record
 
