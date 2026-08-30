@@ -38,7 +38,9 @@ writeup or walkthrough.
 For a component with many candidate CVEs, or when two components need researching at once,
 dispatch the **`cve-researcher`** subagent per component and keep working meanwhile. Give it
 the exact version and the reachable surface; require it to verify claims against the source
-at that version and to report what it could *not* confirm.
+at that version and to report what it could *not* confirm. Create a task per component and
+set its `owner` to the subagent so the dispatch is visible in `TaskList`, and fold the
+returned assessment into the ledger before closing it.
 
 ## Output
 

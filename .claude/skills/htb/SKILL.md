@@ -49,12 +49,30 @@ criteria, dead branches with the evidence that killed them, provisional results,
 timeline. Append and supersede; never delete. A fact that cost effort goes in the moment it
 is obtained, not at the end of the phase.
 
-**Claude Code's built-in task list is the in-session working set** — the todo-tracking
-tool the harness exposes (named `Task` in current builds, `TodoWrite` in older ones; some
-builds expose neither, in which case the ledger carries the whole load). At the start of a
-phase, seed it from the ledger's open leads plus that phase's checklist; keep exactly one
-item in progress; close items as they land. It is a scratch view over the ledger, never the
-record itself — if the two disagree the ledger wins, and the task list is rebuilt from it.
+**The `Task*` tools are the in-session working set.** At the start of a phase, `TaskCreate`
+one task per open lead and per checklist item. `TaskList` picks the next one — lowest ID
+first, since earlier tasks set up context for later ones — `TaskGet` gives its full detail
+and dependencies, and `TaskUpdate` moves it to `in_progress` before work starts and
+`completed` when it lands. Read a task with `TaskGet` before updating it; state goes stale.
+Keep exactly one task `in_progress`.
+
+Use the structure these tools provide rather than a flat list:
+
+- **`addBlockedBy`** for genuine preconditions — the exploit task blocked by the cheap check
+  that would kill it, the escalation task blocked by the enumeration sweep. A blocked task
+  cannot be claimed, which is what mechanically prevents starting on a hypothesis whose
+  premise is unverified.
+- **`metadata`** to carry the ledger's lead number, so a task and its ledger row stay linked
+  across a compaction.
+- **`owner`** when a subagent takes a task, so the dispatch is visible in the list rather
+  than only in your head.
+- **`activeForm`** so the spinner names the actual probe in progress.
+- **`completed`** means the result is written to the ledger — including a *disproven*
+  hypothesis, which is finished work with a row in **Dead**, not a deletion. Reserve
+  `deleted` for tasks created in error.
+
+The task list is a scratch view over the ledger, never the record itself — if the two
+disagree the ledger wins, and the list is rebuilt from it with `TaskCreate`.
 
 The handoff rule: **a task is not done when the command succeeds, it is done when its result
 is in the ledger.** The same applies to anything a subagent returns — record its finding and
