@@ -16,7 +16,7 @@ the current phase from what already exists, then invoke that skill.
 | Phase | Skill | Done when |
 |---|---|---|
 | 0 Bootstrap | `htb-init` | working dir + notebook exist, host resolves |
-| 1 Recon | `htb-recon` | every reachable surface has an exact version in `notes.md` |
+| 1 Recon | `htb-recon` | every reachable surface has an exact version in `ledger.md` |
 | 2 Research | `htb-vuln-research` | each service is classified exploit-path or usage-path |
 | 3 Foothold | `htb-foothold` | a shell, *and* a scriptable channel to it |
 | 4 Enumerate | `htb-enumerate` | the host sweep has run in full, coverage reported |
@@ -31,11 +31,34 @@ host restarts the whole model behind the pivot.
 ## Dispatch
 
 Invoke one skill at a time and finish its phase before moving on. When resuming a box,
-read the working dir's `notes.md` first — it is the source of truth for what has been
+read the working dir's `ledger.md` first and rebuild the task list from it — it is the source of truth for what has been
 tried, what is dead, and which credentials exist.
 
 Phase boundaries are also the checkpoints worth reporting: say what the phase established,
 what it ruled out, and what the next phase will try.
+
+## Ledger and task list
+
+Two trackers, different lifetimes. Keep both.
+
+**`ledger.md` in the working directory is durable shared state.** The user reads and writes
+it too, so it is how you stay in sync with them — and it is what survives a box reset, a
+context compaction, or a new session days later. It carries status, access per principal,
+credentials and where each was sprayed, services and versions, open leads with their kill
+criteria, dead branches with the evidence that killed them, provisional results, and a
+timeline. Append and supersede; never delete. A fact that cost effort goes in the moment it
+is obtained, not at the end of the phase.
+
+**Claude Code's built-in task list is the in-session working set** — the todo-tracking
+tool the harness exposes (named `Task` in current builds, `TodoWrite` in older ones; some
+builds expose neither, in which case the ledger carries the whole load). At the start of a
+phase, seed it from the ledger's open leads plus that phase's checklist; keep exactly one
+item in progress; close items as they land. It is a scratch view over the ledger, never the
+record itself — if the two disagree the ledger wins, and the task list is rebuilt from it.
+
+The handoff rule: **a task is not done when the command succeeds, it is done when its result
+is in the ledger.** The same applies to anything a subagent returns — record its finding and
+the excerpt it was working from, so a later session can judge it.
 
 ## Rules of engagement
 
@@ -56,7 +79,7 @@ encouraged; searching for this machine's solution is not.
 
 **Distinguish observation from inference.** An exploit that visibly worked is a result.
 "Nothing called back", "the sweep found nothing", "the port is closed" are inferences from
-absence — label them provisional in `notes.md`, because a degraded target manufactures them.
+absence — label them provisional in `ledger.md`, because a degraded target manufactures them.
 
 **Suspect the target, not just the approach.** Repeated stalls under light load, especially
 combined with no community first blood well after release, is evidence about the box. Say so

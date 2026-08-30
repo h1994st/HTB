@@ -5,7 +5,7 @@ description: Discover and fingerprint every reachable surface on an HTB target �
 
 # Recon
 
-Goal: a written inventory in `notes.md` where **every listening service and every web
+Goal: a written inventory in `ledger.md` where **every listening service and every web
 application has an exact version**, and every anonymous surface has been read. Breadth
 before depth — the next foothold is usually in something already visible, not in something
 undiscovered.
@@ -35,7 +35,7 @@ degrading and stop rather than collecting false negatives.
 
 ## Recording
 
-`notes.md` gets a service table (port, service, exact version, auth required, notes) and a
+`ledger.md` gets a service table (port, service, exact version, auth required, notes) and a
 credential/identity list. Scans write into the working dir. A surface that answered but
 yielded nothing is still a recorded fact — with *how* it was checked, so it is not
 re-checked blindly later.

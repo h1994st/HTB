@@ -34,16 +34,27 @@ The notebook must run top-to-bottom from a cold kernel and reach both flags.
 - Values that change per session — attacker IP, target IP, ports — come from constants or
   helpers, never hardcoded mid-notebook.
 
-## Before committing
+## Keep the outputs
 
-Clear outputs. Cell outputs carry flags, hashes, tokens, and session state:
+**Do not clear cell outputs.** They are committed deliberately: the notebook *and* its
+outputs are the source for the blog write-up, exported with
 
 ```bash
-uv run python -m jupyter nbconvert --clear-output --inplace BoxName.ipynb
+uv run python -m jupyter nbconvert --to markdown BoxName.ipynb
 ```
 
-Use `common.hide_flag` for any flag that must remain visible in a cell. Then commit exactly
-one commit for the box, on the current season branch:
+That makes output hygiene an authoring-time concern rather than a cleanup pass. While
+writing cells:
+
+- Print what a reader needs to follow the step, not raw dumps — slice long output.
+- Wrap flags in `common.hide_flag` where they are printed.
+- Do not print live secrets in full — private keys, session tokens, uncracked hashes, and
+  anything reused beyond this machine. Show enough to prove the step worked.
+- Re-run any cell you edited, so committed outputs match committed code.
+
+## Committing
+
+Commit exactly one commit for the box, on the current season branch:
 
 ```bash
 git add BoxName.ipynb && git commit -m "HTB: BoxName"

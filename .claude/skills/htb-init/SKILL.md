@@ -20,13 +20,14 @@ machine name. If the IP is not known yet, omit it and fill in `TARGET_IP` later.
   every vhost discovered later to the same line.
 - Get the attacker IP for payloads and listeners from `common.get_openvpn_utun_ip()` — never
   hardcode it, it changes with each VPN session.
-- Open `boxname.htb/notes.md` and keep it current from here on: services and versions,
-  credentials, what has been ruled out and why, flag locations.
+- `boxname.htb/ledger.md` is created for you — the shared state file both you and the user
+  read and write. Fill in **Status** before scanning, and route every later phase's findings
+  into it. The ledger discipline itself lives in the `htb` skill.
 
 ## Conventions this sets up
 
 The working directory holds everything volatile — scans, loot, keys, exploit scripts,
-`notes.md`. Name scripts numerically in the order they were needed (`01-recon.sh`,
+and the ledger. Name scripts numerically in the order they were needed (`01-recon.sh`,
 `02-vhosts.sh`, …) so the whole chain can be replayed after a box reset; a reset is normal,
 not exceptional. The notebook is the distilled writeup and is assembled as work proceeds
 (see `htb-writeup`), not reconstructed at the end.

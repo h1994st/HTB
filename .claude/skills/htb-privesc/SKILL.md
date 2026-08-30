@@ -25,7 +25,7 @@ For each candidate, state up front:
 
 Then run the cheap checks before building the exploit. When the kill criterion is met, say
 so out loud and drop the branch; a hypothesis that has been silently disproven but not
-abandoned is the main way hours disappear. Record dead branches in `notes.md` with the
+abandoned is the main way hours disappear. Record dead branches in `ledger.md` with the
 evidence that killed them, so they are not re-attempted after a reset or a context change.
 
 ## Probing opaque components

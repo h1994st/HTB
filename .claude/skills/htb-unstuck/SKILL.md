@@ -60,5 +60,5 @@ as findings.
 
 ## Then
 
-Whatever breaks the stall, write down in `notes.md` *what* the missing fact was and *why*
+Whatever breaks the stall, write down in `ledger.md` *what* the missing fact was and *why*
 it was not collected earlier. That is the reusable part.

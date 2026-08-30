@@ -11,8 +11,9 @@ A personal Hack The Box workspace. Each machine produces **two** artifacts:
 | Writeup notebook | `BoxName.ipynb` (CamelCase, repo root) | yes — one `HTB: BoxName` commit on the season branch |
 | Working directory | `boxname.htb/` (lowercase) | **no** — `.gitignore` has `*.htb/` |
 
-Everything volatile (scans, loot, exploit scripts, keys, flags, `notes.md`) lives in the
-working directory. The notebook is the distilled, re-runnable writeup.
+Everything volatile (scans, loot, exploit scripts, keys, flags) lives in the working
+directory, alongside `ledger.md` — the shared state file the user and Claude both maintain
+while a box is in progress. The notebook is the distilled, re-runnable writeup.
 
 ## Skills
 
@@ -40,7 +41,7 @@ brew bundle                 # nmap, ffuf, feroxbuster, hashcat, chisel, sqlmap, 
 uv run python <script>.py   # ALWAYS run Python this way — never bare python/python3/pip
 uv add <pkg>                # ALWAYS add Python deps this way — never hand-edit pyproject.toml
 brew bundle add <formula>   # ALWAYS add Homebrew deps this way — never hand-edit Brewfile
-uv run python -m jupyter nbconvert --clear-output --inplace BoxName.ipynb   # before committing
+uv run python -m jupyter nbconvert --to markdown BoxName.ipynb   # export writeup for the blog
 ```
 
 `.claude/settings.json` denies bare `python`/`pip` and `git push`; that is intentional, not a
@@ -63,8 +64,12 @@ Long shell sequences go in `%%script env ... bash` cells so the notebook stays e
 manual steps (reverse-shell upgrade, a second terminal) go in fenced bash blocks in markdown.
 
 Kernel is the project venv (`python3` / `htb (3.14.x)`). `OUTPUT_DIR` points at the
-gitignored working dir, so cells may read/write loot freely — but **clear outputs before
-committing**: flags, hashes, and session tokens leak through cell outputs.
+gitignored working dir, so cells may read/write loot freely.
+
+**Commit cell outputs — do not clear them.** The notebook plus its outputs is the source for
+the blog write-up (`nbconvert --to markdown`). Output hygiene therefore happens while
+authoring: slice long dumps, wrap flags in `common.hide_flag`, and never print keys, tokens,
+or uncracked hashes in full.
 
 ## `common/` package
 

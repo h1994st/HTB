@@ -42,7 +42,7 @@ at that version and to report what it could *not* confirm.
 
 ## Output
 
-Per component, record in `notes.md`: the classification, the candidate primitive, what it
+Per component, record in `ledger.md`: the classification, the candidate primitive, what it
 would grant, its preconditions, and the cheapest way to test whether those preconditions
 hold. That last field is what the next phase acts on.
 

@@ -45,6 +45,6 @@ worth making early and explicitly, not after hours of pasted output.
 
 ## Then
 
-Record the working exploit path and the access helper in `notes.md`, grab the flag if this
+Record the working exploit path and the access helper in `ledger.md`, grab the flag if this
 principal has one, and move to `htb-enumerate`. After any later pivot, return here: the new
 principal's credentials get sprayed too.
