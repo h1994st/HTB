@@ -21,5 +21,8 @@
       "Bash(pip *)",
       "Bash(pip3 *)"
     ]
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1"
   }
 }
