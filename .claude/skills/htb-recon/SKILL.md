@@ -25,7 +25,7 @@ undiscovered.
 5. **Anonymous surfaces.** SMB, NFS, FTP, rsync, LDAP, SNMP, DNS zone transfer, mail verbs —
    anything that answers unauthenticated. Read what they hold; do not just list them.
 6. **Identity harvest.** Collect every username, email, hostname, and internal path seen
-   anywhere in the above. This inventory feeds the spray reflex in `htb-foothold`.
+   anywhere in the above. Every one of them is a spray candidate later.
 
 ## Pacing
 
@@ -39,5 +39,3 @@ degrading and stop rather than collecting false negatives.
 credential/identity list. Scans write into the working dir. A surface that answered but
 yielded nothing is still a recorded fact — with *how* it was checked, so it is not
 re-checked blindly later.
-
-Next phase: `htb-vuln-research`.

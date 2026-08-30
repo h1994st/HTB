@@ -49,8 +49,10 @@ controlling an input. Establish the component's period before designing around i
 ## Verifying
 
 Confirm the new principal actually holds the expected rights before declaring success, and
-re-establish a scriptable channel for it (`htb-foothold`). Then spray its credentials, and
-run `htb-enumerate` again from the new position — the sweep is per principal, not per box.
+establish repeatable access as that principal. Spray its credentials, and run the host sweep
+again from the new position — the sweep is per principal, not per box. A pivot also changes
+the reachable surface and the trust boundaries, so the threat model is rebuilt from where
+you now stand rather than extended.
 
-If ~45 minutes pass on this phase with no new fact, invoke `htb-unstuck` rather than
-deepening the current attempt.
+If roughly 45 minutes pass with no new fact, the problem is the search rather than this
+hypothesis, and the recovery protocol applies.

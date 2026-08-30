@@ -46,6 +46,4 @@ returned assessment into the ledger before closing it.
 
 Per component, record in `ledger.md`: the classification, the candidate primitive, what it
 would grant, its preconditions, and the cheapest way to test whether those preconditions
-hold. That last field is what the next phase acts on.
-
-Next phase: `htb-foothold`.
+hold. That last field is the one that gets acted on first.

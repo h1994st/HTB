@@ -4,9 +4,10 @@
 Usage:  uv run python .claude/skills/htb-init/scripts/new_box.py BoxName [10.129.x.y]
 
 Creates ``boxname.htb/`` (working dir, gitignored via ``*.htb/``) with a
-``ledger.md`` shared-state file, plus ``BoxName.ipynb`` from the skill's
-four-cell template, with the box name, host, and target IP substituted.
-Refuses to clobber an existing notebook.
+the working-dir artifacts (``ledger.md``, ``threat-model.md``,
+``hypotheses.md``), plus ``BoxName.ipynb`` from the skill's four-cell
+template, with the box name, host, and target IP substituted. Existing
+working-dir artifacts are kept; an existing notebook is never clobbered.
 """
 
 import argparse
@@ -15,7 +16,7 @@ from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 NOTEBOOK_TEMPLATE = SKILL_DIR / "assets" / "box-template.ipynb"
-LEDGER_TEMPLATE = SKILL_DIR / "assets" / "ledger.md"
+WORKDIR_TEMPLATES = ("ledger.md", "threat-model.md", "hypotheses.md")
 REPO_ROOT = SKILL_DIR.parents[2]  # .claude/skills/htb-box -> repo root
 
 PLACEHOLDER_IP = "10.129.0.0"
@@ -53,12 +54,13 @@ def main() -> int:
     workdir.mkdir(exist_ok=True)
     notebook.write_text(render(NOTEBOOK_TEMPLATE))
 
-    ledger = workdir / "ledger.md"
-    if ledger.exists():
-        print(f"[=] ledger      : {ledger.relative_to(REPO_ROOT)} (kept)")
-    else:
-        ledger.write_text(render(LEDGER_TEMPLATE))
-        print(f"[+] ledger      : {ledger.relative_to(REPO_ROOT)}")
+    for name in WORKDIR_TEMPLATES:
+        dest = workdir / name
+        if dest.exists():
+            print(f"[=] {name:<15} : {dest.relative_to(REPO_ROOT)} (kept)")
+        else:
+            dest.write_text(render(SKILL_DIR / "assets" / name))
+            print(f"[+] {name:<15} : {dest.relative_to(REPO_ROOT)}")
 
     print(f"[+] working dir : {workdir.relative_to(REPO_ROOT)}/   (gitignored)")
     print(f"[+] notebook    : {notebook.relative_to(REPO_ROOT)}")

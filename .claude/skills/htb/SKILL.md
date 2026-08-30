@@ -11,22 +11,34 @@ scope) and often runs commands themselves; I drive enumeration and exploitation.
 ## Phase model
 
 Phases are a default order, not a pipeline — later phases loop back constantly. Identify
-the current phase from what already exists, then invoke that skill.
+the current phase from what already exists, then invoke that skill. **Sequencing lives here
+and only here**: each phase skill is self-contained and does not name what comes next, so
+this table is what decides the order.
+
+`htb-threat-model` and `htb-hypotheses` are the thinking phases. The model is worth building
+on every box; the hypothesis round earns its cost on a hard one, when there is enough
+information to reason from but no obvious path.
 
 | Phase | Skill | Done when |
 |---|---|---|
-| 0 Bootstrap | `htb-init` | working dir + notebook exist, host resolves |
-| 1 Recon | `htb-recon` | every reachable surface has an exact version in `ledger.md` |
-| 2 Research | `htb-vuln-research` | each service is classified exploit-path or usage-path |
-| 3 Foothold | `htb-foothold` | a shell, *and* a scriptable channel to it |
-| 4 Enumerate | `htb-enumerate` | the host sweep has run in full, coverage reported |
-| 5 Escalate | `htb-privesc` | next principal reached — repeat 3→5 until root |
-| 6 Writeup | `htb-writeup` | notebook runs cold to both flags, outputs cleared |
+| 0 Bootstrap | `htb-init` | working dir, artifacts, and notebook exist; host resolves |
+| 1 Model | `htb-threat-model` | assets, principals, and trust boundaries written down |
+| 2 Recon | `htb-recon` | every reachable surface has an exact version in `ledger.md` |
+| 3 Research | `htb-vuln-research` | each component classified exploit-path or usage-path |
+| 4 Hypotheses | `htb-hypotheses` | competing candidates ranked, execution mode chosen |
+| 5 Foothold | `htb-foothold` | command execution, and a repeatable way back in |
+| 6 Enumerate | `htb-enumerate` | the host sweep has run in full, coverage reported |
+| 7 Escalate | `htb-privesc` | next principal reached — repeat 5→7 until root |
+| 8 Writeup | `htb-writeup` | notebook runs cold to both flags, outputs kept |
 | — Stuck | `htb-unstuck` | invoke from *any* phase after ~45 min without progress |
 
 Loot found in one phase re-enters an earlier one: new credentials go back to the spray
 reflex in `htb-foothold`; a newly reachable service goes back to `htb-recon`; an internal
 host restarts the whole model behind the pivot.
+
+Three artifacts live in the working directory alongside the scripts and loot —
+`ledger.md` (state), `threat-model.md` (structure), `hypotheses.md` (candidates). All three
+are created at bootstrap and are meant to be written to as work happens, not at the end.
 
 ## Dispatch
 

@@ -29,7 +29,9 @@ current one.
 Is the thing being waited on only observable *after* the step being searched for? A log a
 component writes when triggered cannot disclose its trigger; a callback cannot confirm a
 listener that was never reached. If the disclosure is circular, no amount of waiting
-resolves it — switch to bounded stimulus (`htb-privesc`).
+resolves it. Switch to bounded stimulus: enumerate the small hypothesis space the
+component's own naming implies and test the whole set in one batch, then look for a
+reaction.
 
 ## 4. Distinguish absence from evidence
 

@@ -50,5 +50,3 @@ Take the same care with per-object permissions on the objects you can already to
 Write the findings into `ledger.md` as facts with their evidence, and list the checklist
 items that ran. Anything unreadable or denied is itself a finding — record *what* was denied
 and to whom, because that is often the shape of the intended path.
-
-Next phase: `htb-privesc`.

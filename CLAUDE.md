@@ -12,8 +12,10 @@ A personal Hack The Box workspace. Each machine produces **two** artifacts:
 | Working directory | `boxname.htb/` (lowercase) | **no** — `.gitignore` has `*.htb/` |
 
 Everything volatile (scans, loot, exploit scripts, keys, flags) lives in the working
-directory, alongside `ledger.md` — the shared state file the user and Claude both maintain
-while a box is in progress. The notebook is the distilled, re-runnable writeup.
+directory, alongside three artifacts created at bootstrap and maintained while the box is in
+progress: `ledger.md` (shared state — the user reads and writes it too), `threat-model.md`
+(the system model driving enumeration), and `hypotheses.md` (competing candidates and how
+each was killed). The notebook is the distilled, re-runnable writeup.
 
 ## Skills
 
@@ -22,14 +24,19 @@ engagement, and dispatches to the phase skills:
 
 | Skill | Phase |
 |---|---|
-| `htb-init` | working dir + notebook bootstrap (owns the notebook template) |
+| `htb-init` | working dir + notebook bootstrap (owns the templates) |
+| `htb-threat-model` | assets, principals, trust boundaries → `threat-model.md` |
 | `htb-recon` | surfaces, services, exact versions |
 | `htb-vuln-research` | exploit-path vs usage-path, primitive research |
-| `htb-foothold` | credential spray, exploitation, scriptable access |
+| `htb-hypotheses` | competing candidates + execution mode → `hypotheses.md` |
+| `htb-foothold` | credential spray, exploitation, repeatable access |
 | `htb-enumerate` | post-foothold host sweep, per principal |
 | `htb-privesc` | lateral movement and escalation |
 | `htb-unstuck` | recovery protocol, invoked from any phase |
 | `htb-writeup` | notebook assembly and the `HTB: BoxName` commit |
+
+Each phase skill is self-contained and does not name what follows it — the `htb` router owns
+sequencing.
 
 `.claude/agents/cve-researcher.md` is a research subagent for one component at one version.
 

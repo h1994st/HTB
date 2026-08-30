@@ -31,20 +31,37 @@ take the attacker IP from `common.get_openvpn_utun_ip()`.
 
 ## Immediately after execution
 
-**Make the channel scriptable before enumerating anything.** A raw reverse shell, a
-copy-paste loop, or a one-command-at-a-time web shell caps the whole engagement at human
-typing speed. First actions, in order:
+Upgrade the shell to a usable TTY (`shell_upgrade.md`), then make the access repeatable —
+a key, a helper function, or a small script that takes a command and returns its output —
+and verify it round-trips before going further.
 
-1. Upgrade the shell to a usable TTY (`shell_upgrade.md`).
-2. Establish durable, repeatable access — install a key, or wrap the channel in a small
-   helper function or script that takes a command and returns its output.
-3. Verify the helper round-trips before moving on.
+## When the user drives the shell
 
-If the user is driving the shell manually, ask for a key or a handover — that request is
-worth making early and explicitly, not after hours of pasted output.
+The user often runs commands themselves and pastes the output back. **This is a deliberate
+choice, not a limitation to route around.** They are learning from the box, and short
+user-anchored turns bound how much work is lost when a guardrail interrupt forces a rewind
+to their last message. Do not push for a handover or a key as a matter of course; offer one
+only when the work genuinely needs volume, and accept a no.
 
-## Then
+What this does mean is that **a round-trip is the scarce resource, so maximize information
+per round-trip** rather than minimizing round-trips:
 
-Record the working exploit path and the access helper in `ledger.md`, grab the flag if this
-principal has one, and move to `htb-enumerate`. After any later pivot, return here: the new
-principal's credentials get sprayed too.
+- **Batch.** Send one paste-ready block that answers several questions at once, not one
+  command at a time. A block that covers a whole checklist costs the same round-trip as a
+  single `ls`.
+- **Self-label the output.** Print a marker before each section (`echo "=== sudo ==="`) so
+  the paste is readable without a follow-up asking which output is which.
+- **Ask for the discriminating output.** Request what separates the live hypotheses, not
+  general context. If two candidates differ only in one file's permissions, ask for that.
+- **Make blocks safe to re-run and independent of shell state** — no reliance on a variable
+  set in an earlier paste, since the session may have died in between.
+- **Say what each block is testing** before sending it, so the user can redirect before
+  spending a round-trip rather than after.
+
+Failing probes cost the same round-trip as succeeding ones, so put the cheap
+hypothesis-killers first in the block.
+
+## Record
+
+The working exploit path, the access method, and any flag go in `ledger.md` as soon as they
+land. New credentials from this principal re-enter the spray reflex above.
