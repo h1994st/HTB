@@ -19,21 +19,18 @@ each was killed). The notebook is the distilled, re-runnable writeup.
 
 ## Skills
 
-Invoke **`htb`** at the start of every box. It carries the workflow graph (as a mermaid
-diagram), the per-skill entry conditions, and the rules of engagement, and dispatches to the
-rest. The workflow is a cycle, not a pipeline — three clusters feeding each other:
+Invoke **`htb`** at the start of every box. It is the method: the hypothesis/validate/adjust
+loop every step runs, the steps themselves from recon to root, the working artifacts, the
+stuck protocol, and the rules of engagement. High-level guidance lives there and nowhere else.
 
-| Cluster | Skills | Role |
-|---|---|---|
-| Gather | `htb-recon`, `htb-enumerate` | establish what is true from the current position |
-| Make sense | `htb-threat-model`, `htb-vuln-research`, `htb-hypotheses` | turn facts into ranked candidates — **gated on cluster 1** |
-| Act | `htb-foothold`, `htb-privesc` | spend the facts, reach a new position, and cycle again |
+Four skills stand alongside it, each self-contained work in its own right:
 
-Plus `htb-init` (bootstrap, once), `htb-unstuck` (entered from a stall, exits back into
-Gather) and `htb-writeup` (runs throughout, ends in the `HTB: BoxName` commit).
-
-Each skill is self-contained and does not name what follows it — the `htb` router owns
-sequencing, so invoke by precondition rather than by position.
+| Skill | Does |
+|---|---|
+| `htb-init` | bootstraps the working dir, the three artifacts, and the notebook (owns the templates) |
+| `htb-recon` | surface discovery and version fingerprinting |
+| `htb-vuln-research` | per-component vulnerability assessment, delegated to a subagent to keep the reading out of context |
+| `htb-writeup` | notebook assembly and the `HTB: BoxName` commit |
 
 `.claude/agents/cve-researcher.md` is a research subagent for one component at one version.
 

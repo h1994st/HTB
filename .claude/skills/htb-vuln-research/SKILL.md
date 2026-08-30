@@ -1,6 +1,6 @@
 ---
 name: htb-vuln-research
-description: Turn a fingerprinted service inventory into a ranked attack plan — classify each component as an exploit path or a usage path, then research the underlying CVE or primitive (optionally via the cve-researcher subagent). Use after recon, and whenever a new component appears.
+description: Assess a fingerprinted component for known vulnerabilities — classify it as an exploit path or a usage path, then dispatch the cve-researcher subagent to do the reading so the source diffs and advisories never enter the main context. Use once a component has an exact version, and whenever a new one appears.
 ---
 
 # Vulnerability research
@@ -28,19 +28,23 @@ Confirm the premise with one cheap request before researching a theory — that 
 exists, that the code path is reachable, that the plugin is actually enabled. A theory that
 survives one probe is worth research; one that does not was never a lead.
 
-## Researching
+## Delegate the reading
 
-Research the **primitive**: the CVE mechanics, the parser or protocol behaviour, the tool's
-technique. Prefer primary sources — the patch diff, the release notes, the advisory, the
-vendor source at the exact version — over summaries. Never search for this machine's
-writeup or walkthrough.
+**Dispatch the `cve-researcher` subagent per component; do not do the reading here.** Proper
+assessment means release notes, advisories, patch diffs and upstream source at an exact tag —
+tens of thousands of tokens of material whose value is a few lines of conclusion. Keeping
+that out of the main context is the point of the subagent, and it is why several components
+can be assessed at once while other work continues.
 
-For a component with many candidate CVEs, or when two components need researching at once,
-dispatch the **`cve-researcher`** subagent per component and keep working meanwhile. Give it
-the exact version and the reachable surface; require it to verify claims against the source
-at that version and to report what it could *not* confirm. Create a task per component and
-set its `owner` to the subagent so the dispatch is visible in `TaskList`, and fold the
+Give each one the exact version and the reachable surface. Require it to verify claims
+against source at that version rather than trusting a database entry, to report what it could
+*not* confirm, and to say plainly when a component is a dead end. Create a task per component
+with its `owner` set to the subagent so the dispatch is visible in `TaskList`, and fold the
 returned assessment into the ledger before closing it.
+
+Research the **primitive**, never the machine: the CVE mechanics, the parser or protocol
+behaviour, the tool's technique. Searching for this box's writeup or walkthrough is out of
+bounds for both you and the subagent.
 
 ## Output
 
