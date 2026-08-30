@@ -8,7 +8,7 @@ A personal Hack The Box workspace. Each machine produces **two** artifacts:
 
 | Artifact | Naming | Tracked? |
 |---|---|---|
-| Writeup notebook | `BoxName.ipynb` (CamelCase, repo root) | yes — one commit `HTB: BoxName` |
+| Writeup notebook | `BoxName.ipynb` (CamelCase, repo root) | yes — one `HTB: BoxName` commit on the season branch |
 | Working directory | `boxname.htb/` (lowercase) | **no** — `.gitignore` has `*.htb/` |
 
 Everything volatile (scans, loot, exploit scripts, keys, flags, `notes.md`) lives in the
@@ -21,10 +21,11 @@ template, and the anti-stall rules. Invoke it at the start of every box.
 ## Commands
 
 ```bash
-uv sync                     # install deps into .venv (README's requirements.txt is stale)
+uv sync                     # install Python deps into .venv
 brew bundle                 # nmap, ffuf, feroxbuster, hashcat, chisel, sqlmap, ...
 uv run python <script>.py   # ALWAYS run Python this way — never bare python/python3/pip
-uv add <pkg>                # ALWAYS add deps this way — never hand-edit pyproject.toml
+uv add <pkg>                # ALWAYS add Python deps this way — never hand-edit pyproject.toml
+brew bundle add <formula>   # ALWAYS add Homebrew deps this way — never hand-edit Brewfile
 uv run python -m jupyter nbconvert --clear-output --inplace BoxName.ipynb   # before committing
 ```
 
@@ -67,15 +68,20 @@ lookup) — keep that assumption rather than genericizing it.
 
 ## Branch strategy
 
-- `main` — **common infrastructure only**: `common/`, `pyproject.toml`/`uv.lock`, `.claude/`,
-  `CLAUDE.md`, `Brewfile`, docs. No box writeups.
-- `locked-seasonNN` — one branch per HTB season, created manually by the user; carries that
-  season's `BoxName.ipynb` commits on top of `main`.
-- **Never `git push`, and never push on the user's behalf** — these branches stay local.
-  `.claude/settings.json` denies it.
+HTB forbids public writeups for machines that have not retired. That constraint *is* the
+branch strategy:
 
-Worktrees: `.worktrees/main`, `.worktrees/seasonNN` (the `.worktrees/` dir is gitignored).
-The repo root is checked out to the *current* season.
+- `main` — the public branch (the only one pushed to GitHub): `common/`,
+  `pyproject.toml`/`uv.lock`, `.claude/`, `CLAUDE.md`, `Brewfile`, docs, **plus
+  `BoxName.ipynb` for boxes that have retired**. The user moves a notebook here manually
+  once its machine retires — never move one yourself.
+- `locked-seasonNN` — one branch per HTB season, created manually by the user; carries that
+  season's in-progress `BoxName.ipynb` commits on top of `main`.
+- **Never `git push`, and never push on the user's behalf.** Season branches stay local;
+  pushing one would publish a writeup for a live machine. `.claude/settings.json` denies it.
+
+The repo root is checked out to the *current* season; earlier seasons and `main` live in
+worktrees under `.worktrees/` (itself gitignored).
 
 Changing anything common (including this file and the skills) is a **main-first** flow:
 
@@ -86,6 +92,12 @@ git -C .worktrees/seasonNN rebase main                        # 3. each older se
 ```
 
 Box work is the opposite: commit `BoxName.ipynb` directly on the season branch.
+
+### Commit messages
+
+Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`), with a **short body
+or none at all**. The one exception is a box writeup: exactly one commit titled `HTB: BoxName`
+— no prefix, no body, one per box (amend rather than stacking follow-ups).
 
 ## Local tooling gotchas
 
