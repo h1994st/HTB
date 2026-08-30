@@ -19,24 +19,21 @@ each was killed). The notebook is the distilled, re-runnable writeup.
 
 ## Skills
 
-Invoke **`htb`** at the start of every box — it holds the phase model and the rules of
-engagement, and dispatches to the phase skills:
+Invoke **`htb`** at the start of every box. It carries the workflow graph (as a mermaid
+diagram), the per-skill entry conditions, and the rules of engagement, and dispatches to the
+rest. The workflow is a cycle, not a pipeline — three clusters feeding each other:
 
-| Skill | Phase |
-|---|---|
-| `htb-init` | working dir + notebook bootstrap (owns the templates) |
-| `htb-threat-model` | assets, principals, trust boundaries → `threat-model.md` |
-| `htb-recon` | surfaces, services, exact versions |
-| `htb-vuln-research` | exploit-path vs usage-path, primitive research |
-| `htb-hypotheses` | competing candidates + execution mode → `hypotheses.md` |
-| `htb-foothold` | credential spray, exploitation, repeatable access |
-| `htb-enumerate` | post-foothold host sweep, per principal |
-| `htb-privesc` | lateral movement and escalation |
-| `htb-unstuck` | recovery protocol, invoked from any phase |
-| `htb-writeup` | notebook assembly and the `HTB: BoxName` commit |
+| Cluster | Skills | Role |
+|---|---|---|
+| Gather | `htb-recon`, `htb-enumerate` | establish what is true from the current position |
+| Make sense | `htb-threat-model`, `htb-vuln-research`, `htb-hypotheses` | turn facts into ranked candidates — **gated on cluster 1** |
+| Act | `htb-foothold`, `htb-privesc` | spend the facts, reach a new position, and cycle again |
 
-Each phase skill is self-contained and does not name what follows it — the `htb` router owns
-sequencing.
+Plus `htb-init` (bootstrap, once), `htb-unstuck` (entered from a stall, exits back into
+Gather) and `htb-writeup` (runs throughout, ends in the `HTB: BoxName` commit).
+
+Each skill is self-contained and does not name what follows it — the `htb` router owns
+sequencing, so invoke by precondition rather than by position.
 
 `.claude/agents/cve-researcher.md` is a research subagent for one component at one version.
 
