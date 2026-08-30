@@ -36,6 +36,9 @@ machine:
 | `htb-init` | HTB | bootstraps the working dir, the three artifacts, and the notebook (owns the templates) |
 | `htb-writeup` | HTB | notebook assembly and the `HTB: BoxName` commit |
 
+`sunder` names two environment-specific steps without binding them to any skill. In this
+repo they bind as: **bootstrap** → `htb-init`, **report** → `htb-writeup`.
+
 `.claude/agents/cve-researcher.md` is a research subagent for one component at one version.
 
 ## Commands

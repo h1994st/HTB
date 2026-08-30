@@ -12,11 +12,13 @@ themselves; I drive enumeration and exploitation.
 This document is the whole method: how to think, what each step is for, and what to do when
 stuck. Nothing general lives outside it.
 
-Four skills stand alongside it for work that is a self-contained job. Two are general —
-`sunder-recon` (surface discovery) and `sunder-vuln-research` (per-component vulnerability
-assessment, delegated to a subagent). Two are specific to how this workspace records an HTB
-machine — `htb-init` (bootstrap) and `htb-writeup` (notebook and commit); in another
-environment they are whatever that environment uses to set up and to report.
+Two skills stand alongside it for work that is a self-contained job: `sunder-recon` (surface
+discovery) and `sunder-vuln-research` (per-component vulnerability assessment, delegated to a
+subagent).
+
+Two more steps — **bootstrap** and **report** — are environment-specific by nature: how a
+workspace lays out a target's files and how it records the result differ per project. The
+project's own instructions name the skills that fill those two slots.
 
 ## The method
 
@@ -56,7 +58,7 @@ A cycle, not a pipeline. Every pivot restarts it from the new position.
 
 ```mermaid
 flowchart TD
-    init["htb-init<br/>working dir, artifacts, notebook"]
+    init["bootstrap<br/>working dir, artifacts"]
 
     subgraph GATHER["1. Gather - what is true from here"]
         recon["sunder-recon<br/>surfaces, versions"]
@@ -74,7 +76,7 @@ flowchart TD
         escalate["escalate<br/>next principal"]
     end
 
-    writeup["htb-writeup<br/>notebook, then one commit"]
+    report["report<br/>record the path taken"]
 
     init --> recon
     recon --> model
@@ -93,11 +95,12 @@ flowchart TD
     sweep -.->|rebuild from the new position| model
     sweep -.->|new host or network| recon
     escalate -.->|new principal, sweep again| sweep
-    foothold -.-> writeup
-    escalate -.-> writeup
+    foothold -.-> report
+    escalate -.-> report
 ```
 
-**Bootstrap** — `htb-init` here. Working directory, the three artifacts, the notebook.
+**Bootstrap** — the working directory and the three artifacts, however this environment
+lays them out.
 
 **Gather** — `sunder-recon` from outside; the host sweep below once inside. Both answer the
 same question from different positions.
@@ -108,7 +111,8 @@ subagent per component so the research does not consume this context.
 
 **Act** — foothold and escalation, below.
 
-**Writeup** — `htb-writeup` here, continuously as milestones land, ending in one commit.
+**Report** — record the path continuously as milestones land, in whatever form this
+environment expects, rather than reconstructing it at the end.
 
 ## Foothold
 
@@ -132,15 +136,15 @@ transformations between you and the sink: URL and shell decoding, length limits,
 filters, encoding conversions. Through a hostile parser, stage it — land an encoded blob,
 decode on the target, then execute.
 
-**After execution.** Upgrade to a usable TTY (in this workspace, `shell_upgrade.md`), make the access repeatable,
-and verify it round-trips before going further.
+**After execution.** Upgrade to a usable TTY, make the access repeatable, and verify it
+round-trips before going further.
 
 ## Host sweep
 
 Run once per principal, in full, timeboxed, and report which items ran. It is a checklist
 rather than a hunch on purpose: the missing fact is usually boring, and skipping to the
-interesting-looking lead is what turns a short engagement into a long one. Automated enumeration
-scripts run *last*, as a net under a sweep already done by hand.
+interesting-looking lead is what turns a short engagement into a long one. Automated
+enumeration scripts run *last*, as a net under a sweep already done by hand.
 
 - **Identity** — user, groups and what they grant; other accounts with shells or home
   directories; what this principal can do that the last one could not.
@@ -174,7 +178,8 @@ Anything unreadable or denied is itself a finding: record *what* was denied and 
 
 Rank leads by specificity — a custom service, a non-stock unit, a delegated right, a
 held-back package or an odd group outranks a generic misconfiguration — on an authored
-target the unusual thing is usually the intended thing. Prefer whichever candidate one cheap observation settles.
+target the unusual thing is usually the intended thing. Prefer whichever candidate one cheap
+observation settles.
 
 - **Delegated execution** — read the exact permitted command, its arguments, and whether
   environment or wildcards survive; argument injection into a permitted binary is more common
@@ -205,7 +210,8 @@ target the unusual thing is usually the intended thing. Prefer whichever candida
   whole set in one batch, then look for a reaction.
 
 Confirm the new principal actually holds the expected rights before declaring success, then
-establish repeatable access, collect any flag, spray its credentials, and sweep again.
+establish repeatable access, collect whatever this principal was holding, spray its
+credentials, and sweep again.
 
 ## Artifacts
 
@@ -226,10 +232,9 @@ boundaries where data crosses into something more privileged; inputs the system 
 renders, deserializes, executes, schedules or fetches, and which you can influence — including
 those arriving on a timer rather than a request; and, on an authored target, what it is
 *about* — themed names, odd components and deliberately old versions are the author telling
-you the topic.
-Mark every line **observed** or **assumed**; assumptions inherited from a familiar-looking
-stack are what quietly misdirect a session. Each boundary converts into the cheapest question
-that settles it, and those questions are what gathering should answer.
+you the topic. Mark every line **observed** or **assumed**; assumptions inherited from a
+familiar-looking stack are what quietly misdirect a session. Each boundary converts into the
+cheapest question that settles it, and those questions are what gathering should answer.
 
 **`hypotheses.md` — the candidates.** Work in rounds, recording the facts reasoned from *and
 the notable gaps*. Force variety: one candidate per trust boundary, one for the component
@@ -241,8 +246,8 @@ round closes with every candidate confirmed, killed with evidence, or untested w
 
 **Fanning out.** On a hard target the candidates can be tested by subagents in parallel rather
 than sequentially — **ask the user which**, it is their call. A fan-out divides the request
-budget rather than lifting it: concurrent agents probing one small VM will knock it over, and
-a degraded target manufactures false negatives across every branch at once. Fan out freely on
+budget rather than lifting it: concurrent agents probing one small host will knock it over,
+and a degraded target manufactures false negatives across every branch at once. Fan out freely on
 *analysis* — reading source, researching primitives, reasoning over collected loot — and
 serialize anything touching the target. Require a verdict against the kill criterion rather
 than a narrative, and set each agent's task `owner` so the dispatch is visible.
@@ -296,8 +301,9 @@ not collected earlier. That is the reusable part.
 
 ## Rules of engagement
 
-**Pace.** Small single-host VMs. One job at a time, 2–4 threads, and never stack a web sweep
-with a spray and an expensive server-side render. Estimate and state a sweep's request count
+**Pace.** Assume the target is fragile — typically a single small host with no capacity to
+spare. One job at a time, 2–4 threads, and never stack a web sweep with a spray and an
+expensive server-side render. Estimate and state a sweep's request count
 before launching it; if it runs to thousands, narrow the wordlist. Classify errors and
 timeouts as a *third* outcome distinct from hit and miss, and abort rather than recording
 them as misses.
@@ -313,9 +319,9 @@ encouraged; searching for this specific target's answer is not.
 
 **When the user drives the shell, a round-trip is the scarce resource.** They often run
 commands themselves and paste output back; that is deliberate — they are learning from the
-target, and short user-anchored turns bound how much work a guardrail interrupt destroys when it
-rewinds to their last message. Do not push for a handover or a key as a matter of course, and
-accept a no. Maximize information per round-trip instead: batch one paste-ready block
+target, and short user-anchored turns bound how much work a guardrail interrupt destroys
+when it rewinds to their last message. Do not push for a handover or a key as a matter of
+course, and accept a no. Maximize information per round-trip instead: batch one paste-ready block
 answering several questions; print a marker before each section so the paste needs no
 follow-up; ask for the output that discriminates between live candidates; keep blocks
 re-runnable and independent of shell state, since the session may have died in between; and
