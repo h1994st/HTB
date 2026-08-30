@@ -19,18 +19,22 @@ each was killed). The notebook is the distilled, re-runnable writeup.
 
 ## Skills
 
-Invoke **`htb`** at the start of every box. It is the method: the hypothesis/validate/adjust
-loop every step runs, the steps themselves from recon to root, the working artifacts, the
-stuck protocol, and the rules of engagement. High-level guidance lives there and nowhere else.
+Invoke **`sunder`** at the start of every box. It is the method — the
+hypothesis/validate/adjust loop every step runs, the steps from recon to root, the working
+artifacts, the stuck protocol, and the rules of engagement. General guidance lives there and
+nowhere else.
 
-Four skills stand alongside it, each self-contained work in its own right:
+The skill set splits by scope. `sunder*` skills are general offensive-security method and
+carry nothing HTB-specific; `htb-*` skills are how *this workspace* sets up and records a
+machine:
 
-| Skill | Does |
-|---|---|
-| `htb-init` | bootstraps the working dir, the three artifacts, and the notebook (owns the templates) |
-| `htb-recon` | surface discovery and version fingerprinting |
-| `htb-vuln-research` | per-component vulnerability assessment, delegated to a subagent to keep the reading out of context |
-| `htb-writeup` | notebook assembly and the `HTB: BoxName` commit |
+| Skill | Scope | Does |
+|---|---|---|
+| `sunder` | general | the method, the steps, the artifacts, the rules of engagement |
+| `sunder-recon` | general | surface discovery and version fingerprinting |
+| `sunder-vuln-research` | general | per-component assessment, delegated to a subagent to keep the reading out of context |
+| `htb-init` | HTB | bootstraps the working dir, the three artifacts, and the notebook (owns the templates) |
+| `htb-writeup` | HTB | notebook assembly and the `HTB: BoxName` commit |
 
 `.claude/agents/cve-researcher.md` is a research subagent for one component at one version.
 

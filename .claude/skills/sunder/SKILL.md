@@ -1,18 +1,22 @@
 ---
-name: htb
-description: How to work a Hack The Box machine in this repo — the method, the steps from recon to root, the working artifacts, and the rules of engagement. Use at the start of a box, when resuming one, and whenever the next move is unclear.
+name: sunder
+description: The method for working an authorized offensive engagement — the hypothesis/validate/adjust loop every step runs, the steps from recon to root, the working artifacts, the stuck protocol, and the rules of engagement. Use at the start of a target, when resuming one, and whenever the next move is unclear.
 ---
 
-# Working an HTB box
+# Sunder
 
-Authorized practice against HTB's own targets. The user drives box control — VPN, resets,
-scope — and often runs commands themselves; I drive enumeration and exploitation.
+The method for authorized offensive work — lab machines, CTF targets, sanctioned
+assessments. The user drives target control (VPN, resets, scope) and often runs commands
+themselves; I drive enumeration and exploitation.
 
-This document is the whole method. Four skills exist alongside it for work that stands on
-its own: `htb-init` (bootstrap), `htb-recon` (surface discovery), `htb-vuln-research`
-(per-component vulnerability assessment, dispatched to a subagent) and `htb-writeup`
-(notebook and commit). Everything else — how to think, what each step is for, what to do
-when stuck — is here.
+This document is the whole method: how to think, what each step is for, and what to do when
+stuck. Nothing general lives outside it.
+
+Four skills stand alongside it for work that is a self-contained job. Two are general —
+`sunder-recon` (surface discovery) and `sunder-vuln-research` (per-component vulnerability
+assessment, delegated to a subagent). Two are specific to how this workspace records an HTB
+machine — `htb-init` (bootstrap) and `htb-writeup` (notebook and commit); in another
+environment they are whatever that environment uses to set up and to report.
 
 ## The method
 
@@ -44,7 +48,7 @@ a branch that has already been disproven from quietly continuing to consume hour
 **Separate observation from inference.** An exploit that visibly worked is a result.
 "Nothing called back", "the sweep found nothing", "the port looked closed" are inferences
 from absence — mark them provisional, especially when the target is unstable, because a
-degraded box manufactures them.
+degraded target manufactures them.
 
 ## The steps
 
@@ -55,13 +59,13 @@ flowchart TD
     init["htb-init<br/>working dir, artifacts, notebook"]
 
     subgraph GATHER["1. Gather - what is true from here"]
-        recon["htb-recon<br/>surfaces, versions"]
+        recon["sunder-recon<br/>surfaces, versions"]
         sweep["host sweep<br/>per principal, after any shell"]
     end
 
     subgraph SENSE["2. Make sense - gated on having enough facts"]
         model["threat model<br/>assets, principals, boundaries"]
-        research["htb-vuln-research<br/>exploit-path vs usage-path"]
+        research["sunder-vuln-research<br/>exploit-path vs usage-path"]
         hypo["hypotheses<br/>ranked candidates, kill criteria"]
     end
 
@@ -93,18 +97,18 @@ flowchart TD
     escalate -.-> writeup
 ```
 
-**Bootstrap** — `htb-init`. Working directory, the three artifacts, the notebook.
+**Bootstrap** — `htb-init` here. Working directory, the three artifacts, the notebook.
 
-**Gather** — `htb-recon` outside; the host sweep below once inside. Both answer the same
-question from different positions.
+**Gather** — `sunder-recon` from outside; the host sweep below once inside. Both answer the
+same question from different positions.
 
 **Make sense** — the threat model and the hypothesis set, both described under *Artifacts*.
-Component-level vulnerability assessment goes to `htb-vuln-research`, which dispatches a
+Component-level vulnerability assessment goes to `sunder-vuln-research`, which dispatches a
 subagent per component so the research does not consume this context.
 
 **Act** — foothold and escalation, below.
 
-**Writeup** — `htb-writeup`, continuously as milestones land, ending in one commit.
+**Writeup** — `htb-writeup` here, continuously as milestones land, ending in one commit.
 
 ## Foothold
 
@@ -114,7 +118,7 @@ often the intended path.
 **The spray reflex.** The instant any password, hash, key or token appears — from a share, a
 config, a dump, a crack, a backup — spray it against every service and every known identity.
 One loop, seconds. Repeat every time a new secret appears; reuse across accounts and services
-is the most common progression on these machines. Then read everything the new access opens;
+is the most common progression on these targets. Then read everything the new access opens;
 credentials chain to credentials.
 
 **Exploitation.** Build the exploit as a script in the working directory, parameterised by
@@ -128,14 +132,14 @@ transformations between you and the sink: URL and shell decoding, length limits,
 filters, encoding conversions. Through a hostile parser, stage it — land an encoded blob,
 decode on the target, then execute.
 
-**After execution.** Upgrade to a usable TTY (`shell_upgrade.md`), make the access repeatable,
+**After execution.** Upgrade to a usable TTY (in this workspace, `shell_upgrade.md`), make the access repeatable,
 and verify it round-trips before going further.
 
 ## Host sweep
 
 Run once per principal, in full, timeboxed, and report which items ran. It is a checklist
 rather than a hunch on purpose: the missing fact is usually boring, and skipping to the
-interesting-looking lead is what turns a short box into a long one. Automated enumeration
+interesting-looking lead is what turns a short engagement into a long one. Automated enumeration
 scripts run *last*, as a net under a sweep already done by hand.
 
 - **Identity** — user, groups and what they grant; other accounts with shells or home
@@ -169,8 +173,8 @@ Anything unreadable or denied is itself a finding: record *what* was denied and 
 ## Escalation
 
 Rank leads by specificity — a custom service, a non-stock unit, a delegated right, a
-held-back package or an odd group outranks a generic misconfiguration, because the machine is
-authored. Prefer whichever candidate one cheap observation settles.
+held-back package or an odd group outranks a generic misconfiguration — on an authored
+target the unusual thing is usually the intended thing. Prefer whichever candidate one cheap observation settles.
 
 - **Delegated execution** — read the exact permitted command, its arguments, and whether
   environment or wildcards survive; argument injection into a permitted binary is more common
@@ -220,8 +224,9 @@ moment it is obtained.
 each; every principal the system defines and the credential material it must hold; trust
 boundaries where data crosses into something more privileged; inputs the system parses,
 renders, deserializes, executes, schedules or fetches, and which you can influence — including
-those arriving on a timer rather than a request; and what the machine is *about*, since themed
-names, odd components and deliberately old versions are the author telling you the topic.
+those arriving on a timer rather than a request; and, on an authored target, what it is
+*about* — themed names, odd components and deliberately old versions are the author telling
+you the topic.
 Mark every line **observed** or **assumed**; assumptions inherited from a familiar-looking
 stack are what quietly misdirect a session. Each boundary converts into the cheapest question
 that settles it, and those questions are what gathering should answer.
@@ -234,7 +239,7 @@ frequently right and gets skipped as too boring. Include at least one that contr
 current working assumption; if every candidate shares a premise, test the premise first. Each
 round closes with every candidate confirmed, killed with evidence, or untested with a reason.
 
-**Fanning out.** On a hard box the candidates can be tested by subagents in parallel rather
+**Fanning out.** On a hard target the candidates can be tested by subagents in parallel rather
 than sequentially — **ask the user which**, it is their call. A fan-out divides the request
 budget rather than lifting it: concurrent agents probing one small VM will knock it over, and
 a degraded target manufactures false negatives across every branch at once. Fan out freely on
@@ -282,9 +287,9 @@ the same place. Work these in order; stop at the one that produces a new fact.
 6. **Re-read the user's own steers.** Their stated theory of the blocker is the highest-value
    lead available and the easiest to acknowledge and then drift away from. Treat it as a hard
    interrupt; if a different branch resumes later, say why.
-7. **Consider the target.** Persistent instability under light load — especially without a
-   community first blood well after release — is evidence about the machine. Say so plainly
-   and offer parking it.
+7. **Consider the target.** Persistent instability under light load is evidence about the
+   target, not the approach — and on a lab or competition machine, nobody having solved it
+   well after release is corroboration. Say so plainly and offer parking it.
 
 Whatever breaks the stall, record in the ledger *what* the missing fact was and *why* it was
 not collected earlier. That is the reusable part.
@@ -302,12 +307,13 @@ whether an accepted value can be removed again. If it cannot — a transaction p
 ledger, append-only table — test validation with well-formed-but-wrong values, never an empty
 or truncated body. A stuck malformed entry can break the progression path and force a reset.
 
-**No box writeups or walkthroughs.** Researching a CVE, tool or underlying primitive is
-encouraged; searching for this machine's solution is not.
+**Do not look up the target's published solution.** On a lab or CTF machine, a writeup or
+walkthrough spoils the exercise. Researching a CVE, tool or underlying primitive is
+encouraged; searching for this specific target's answer is not.
 
 **When the user drives the shell, a round-trip is the scarce resource.** They often run
 commands themselves and paste output back; that is deliberate — they are learning from the
-box, and short user-anchored turns bound how much work a guardrail interrupt destroys when it
+target, and short user-anchored turns bound how much work a guardrail interrupt destroys when it
 rewinds to their last message. Do not push for a handover or a key as a matter of course, and
 accept a no. Maximize information per round-trip instead: batch one paste-ready block
 answering several questions; print a marker before each section so the paste needs no
@@ -317,4 +323,5 @@ say what a block tests before sending it, so a redirect costs nothing. Failing p
 same as succeeding ones, so put the cheap candidate-killers first.
 
 **Record artifacts, not just outcomes.** Every step goes into the working directory as a
-numbered, re-runnable script. Boxes get reset; anything not scripted will be retyped.
+numbered, re-runnable script. Targets get reset and rebuilt; anything not scripted will be
+retyped.

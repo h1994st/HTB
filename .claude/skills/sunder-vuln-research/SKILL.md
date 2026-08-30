@@ -1,5 +1,5 @@
 ---
-name: htb-vuln-research
+name: sunder-vuln-research
 description: Assess a fingerprinted component for known vulnerabilities — classify it as an exploit path or a usage path, then dispatch the cve-researcher subagent to do the reading so the source diffs and advisories never enter the main context. Use once a component has an exact version, and whenever a new one appears.
 ---
 
@@ -42,9 +42,9 @@ against source at that version rather than trusting a database entry, to report 
 with its `owner` set to the subagent so the dispatch is visible in `TaskList`, and fold the
 returned assessment into the ledger before closing it.
 
-Research the **primitive**, never the machine: the CVE mechanics, the parser or protocol
-behaviour, the tool's technique. Searching for this box's writeup or walkthrough is out of
-bounds for both you and the subagent.
+Research the **primitive**, never the target: the CVE mechanics, the parser or protocol
+behaviour, the tool's technique. On a lab or competition target, searching for its published
+solution is out of bounds for both you and the subagent.
 
 ## Output
 

@@ -1,6 +1,6 @@
 ---
-name: htb-recon
-description: Discover and fingerprint every reachable surface on an HTB target — ports, services, web content, virtual hosts, and anonymous shares — and pin an exact version to each. Use after bootstrapping a box, and again whenever a pivot exposes a new network.
+name: sunder-recon
+description: Discover and fingerprint every reachable surface on a target — ports, services, web content, virtual hosts, and anonymous shares — and pin an exact version to each. Use at the start of an engagement, and again whenever a pivot exposes a new network.
 ---
 
 # Recon
