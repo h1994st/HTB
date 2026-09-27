@@ -23,6 +23,12 @@ just the command. A reader should be able to follow the reasoning without the co
 
 The notebook must run top-to-bottom from a cold kernel and reach both flags.
 
+- **The notebook is self-contained.** It is the box's only tracked artifact — the working
+  directory (`OUTPUT_DIR`) is gitignored, so anything living only there is gone for a reader.
+  Inline box-specific exploit code in the cells, and lift genuinely reusable helpers into
+  `common/` on `main`; never source a script or import a module that lives only in the working
+  dir. `OUTPUT_DIR` is for reading and writing **loot** at runtime, not for code the notebook
+  depends on.
 - Python steps go in code cells; multi-command shell sequences go in `%%script env ... bash`
   cells so they stay runnable.
 - Steps that genuinely cannot be automated — a TTY upgrade, a second terminal, a listener
