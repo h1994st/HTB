@@ -38,7 +38,7 @@ in method.
 6. **Adjust.** Record the outcome, kill what is dead *out loud*, and update the model. A
    disproven hypothesis is a result, not a wasted hour — but only if it is written down.
 
-Three rules keep the loop honest:
+Four rules keep the loop honest:
 
 **Information gates the loop.** A model built on thin facts is a guess wearing structure, and
 hypotheses generated from an unexamined inventory just re-encode the blind spot. If
@@ -51,6 +51,10 @@ a branch that has already been disproven from quietly continuing to consume hour
 "Nothing called back", "the sweep found nothing", "the port looked closed" are inferences
 from absence — mark them provisional, especially when the target is unstable, because a
 degraded target manufactures them.
+
+**Re-rank, don't chase.** Every result feeds back into the ranked set *before* the next action:
+a new observation updates the candidates and their order — it is not itself the next move.
+Chasing the latest output is how a session abandons a half-killed branch and starts looping.
 
 ## The steps
 
@@ -249,13 +253,31 @@ frequently right and gets skipped as too boring. Include at least one that contr
 current working assumption; if every candidate shares a premise, test the premise first. Each
 round closes with every candidate confirmed, killed with evidence, or untested with a reason.
 
-**Fanning out.** On a hard target the candidates can be tested by subagents in parallel rather
-than sequentially — **ask the user which**, it is their call. A fan-out divides the request
-budget rather than lifting it: concurrent agents probing one small host will knock it over,
-and a degraded target manufactures false negatives across every branch at once. Fan out freely on
-*analysis* — reading source, researching primitives, reasoning over collected loot — and
-serialize anything touching the target. Require a verdict against the kill criterion rather
-than a narrative, and set each agent's task `owner` so the dispatch is visible.
+## Operating model — coordinator & workers
+
+Run the loop as a **coordinator** dispatching **workers**, so validation noise never erodes the
+hypothesis discipline. The failure it prevents is one agent doing both jobs — letting the newest
+tool output pick the next move while raw dumps crowd out the ranked set.
+
+**Coordinator** (you). Owns the ranked hypothesis set, the three artifacts, and the single
+target channel/state, and is the only voice to the user. Takes **verdicts, not transcripts**
+back, so its context stays lean enough to re-rank after every result.
+
+**Workers.** One lead or one component each, returning a **verdict against the kill criterion**
+with its evidence, not a narrative. Prefer a fresh typed agent (small, stable preamble) over a
+fork that inherits your whole context; a small reusable roster keeps them cheap and
+cache-friendly, but the real win is **context isolation** — the worker's reading, scans and
+dumps stay in its throwaway context. Two classes, opposite rules:
+
+- *Analysis* — read source, research primitives (`sunder-vuln-research`), reason over loot. Fan
+  these out **in parallel**; they never touch the target.
+- *Target actions* — scans, sprays, exploits. **Serialized** through the coordinator's one
+  channel: a fan-out divides the request budget rather than lifting it, and concurrent probes
+  knock a small host over and manufacture false negatives across every branch at once.
+
+Adaptive: drive cheap steps yourself; spin up workers when validation is heavy, parallelizable,
+or the loop has stalled — **ask the user before a large fan-out**. Set each dispatch's task
+`owner` so it is visible, and fold every verdict into `hypotheses.md`.
 
 ## Tracking
 
