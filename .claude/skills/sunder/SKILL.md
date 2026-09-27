@@ -181,6 +181,11 @@ held-back package or an odd group outranks a generic misconfiguration — on an 
 target the unusual thing is usually the intended thing. Prefer whichever candidate one cheap
 observation settles.
 
+- **Known-vulnerable versions** — pin the exact version of every privileged component (service,
+  SUID binary, kernel module) and run `sunder-vuln-research` on it *before* hand-crafting a
+  misconfig/technique exploit. A version that differs from the package manager — a custom build,
+  a held-back or downgraded package — is a top lead, not a footnote. A vulnerable-looking version
+  number is an inference: confirm the *fix* version before committing to a path.
 - **Delegated execution** — read the exact permitted command, its arguments, and whether
   environment or wildcards survive; argument injection into a permitted binary is more common
   than a permitted shell. Setuid/setgid binaries, file capabilities, policy-mediated services.
@@ -278,7 +283,9 @@ the same place. Work these in order; stop at the one that produces a new fact.
 1. **Inventory what was never looked at** — not what was examined more deeply. A credential
    store never opened, a service definition never read, a version never compared, a directory
    never listed, a host never scanned, an account never sprayed. The answer to a long stall is
-   almost always a cheap fact never collected, not a subtle insight about facts in hand.
+   almost always a cheap fact never collected, not a subtle insight about facts in hand. For a
+   privesc that will not move, the version never compared is usually it — pin the blocking
+   component's exact version and dispatch `sunder-vuln-research` before grinding on a technique.
 2. **Re-read the evidence instead of re-running it.** Loot gathered early and skimmed under a
    different hypothesis routinely answers the current one.
 3. **Check for circular expectations.** Is the thing being waited on only observable *after*
