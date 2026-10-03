@@ -3,11 +3,12 @@
 
 Usage:  uv run python .claude/skills/htb-init/scripts/new_box.py BoxName [10.129.x.y]
 
-Creates ``boxname.htb/`` (working dir, gitignored via ``*.htb/``) with a
-the working-dir artifacts (``ledger.md``, ``threat-model.md``,
-``hypotheses.md``), plus ``BoxName.ipynb`` from the skill's four-cell
-template, with the box name, host, and target IP substituted. Existing
-working-dir artifacts are kept; an existing notebook is never clobbered.
+Creates ``boxname.htb/`` (working dir, gitignored via ``*.htb/``) with the
+working-dir artifacts (``ledger.md`` and ``hypotheses.md`` — the latter
+opens with a Surface & boundaries map that seeds the hypothesis rounds),
+plus ``BoxName.ipynb`` from the skill's four-cell template, with the box
+name, host, and target IP substituted. Existing working-dir artifacts are
+kept; an existing notebook is never clobbered.
 """
 
 import argparse
@@ -16,7 +17,7 @@ from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 NOTEBOOK_TEMPLATE = SKILL_DIR / "assets" / "box-template.ipynb"
-WORKDIR_TEMPLATES = ("ledger.md", "threat-model.md", "hypotheses.md")
+WORKDIR_TEMPLATES = ("ledger.md", "hypotheses.md")
 REPO_ROOT = SKILL_DIR.parents[2]  # .claude/skills/htb-box -> repo root
 
 PLACEHOLDER_IP = "10.129.0.0"

@@ -13,12 +13,21 @@ undiscovered.
 ## Order
 
 1. **Ports.** Full TCP sweep first, then targeted service/script scans on what is open.
-   UDP top-ports only when TCP is thin. `common.scan_ports` handles the scan-and-parse.
+   UDP top-ports only when TCP is thin. Run `.claude/skills/sunder-recon/scripts/portscan.sh
+   <target>` for the live sweep — it needs root (SYN scan), so on macOS **prompt the user to
+   run it manually with `sudo`**; it writes `-oA` output into `./scans`. `common.scan_ports`
+   is the notebook equivalent.
 2. **Per-service banners and versions.** Every open port gets fingerprinted, not just the
    web ones. Note the OS and any hostname/domain the services leak.
-3. **Web surface.** Directory and file discovery, then virtual-host discovery against every
-   domain the certificates, redirects, or page content reveal. New vhosts go into
-   `/etc/hosts` and are then treated as new targets from step 2.
+3. **Web surface.** Directory and file discovery
+   (`.claude/skills/sunder-recon/scripts/dirscan-ferox.sh <url>`), then virtual-host discovery
+   (`.claude/skills/sunder-recon/scripts/vhost-ffuf.sh <url> <base-domain[:port]>`) against
+   every domain the certificates, redirects, or page content reveal. Both fuzzers read
+   `$SECLISTS` — **ask the user for their SecLists checkout and `export SECLISTS=<path>`; never
+   hardcode a path** — or take a wordlist as the last argument. Mind the pace (see the sunder
+   *Rules of engagement*): estimate the request count, narrow the wordlist, lower `THREADS`
+   for a fragile host, and never stack a sweep with a spray. New vhosts go into `/etc/hosts`
+   and are then treated as new targets from step 2.
 4. **Client-side.** Read the JavaScript bundles, source maps, comments, and API definitions
    before fuzzing for endpoints — applications usually name their own routes. Check
    `robots.txt`, exposed `.git`, backup and editor swap files.

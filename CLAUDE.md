@@ -12,10 +12,10 @@ A personal Hack The Box workspace. Each machine produces **two** artifacts:
 | Working directory | `boxname.htb/` (lowercase) | **no** — `.gitignore` has `*.htb/` |
 
 Everything volatile (scans, loot, exploit scripts, keys, flags) lives in the working
-directory, alongside three artifacts created at bootstrap and maintained while the box is in
-progress: `ledger.md` (shared state — the user reads and writes it too), `threat-model.md`
-(the system model driving enumeration), and `hypotheses.md` (competing candidates and how
-each was killed). The notebook is the distilled, re-runnable writeup.
+directory, alongside two artifacts created at bootstrap and maintained while the box is in
+progress: `ledger.md` (shared state — the user reads and writes it too) and `hypotheses.md`
+(which opens with a *Surface & boundaries* system model, then the competing candidates and
+how each was killed). The notebook is the distilled, re-runnable writeup.
 
 ## Skills
 
@@ -33,7 +33,7 @@ machine:
 | `sunder` | general | the method, the steps, the artifacts, the rules of engagement |
 | `sunder-recon` | general | surface discovery and version fingerprinting |
 | `sunder-vuln-research` | general | per-component assessment, delegated to a subagent to keep the reading out of context |
-| `htb-init` | HTB | bootstraps the working dir, the three artifacts, and the notebook (owns the templates) |
+| `htb-init` | HTB | bootstraps the working dir, the two artifacts, and the notebook (owns the templates) |
 | `htb-writeup` | HTB | notebook assembly and the `HTB: BoxName` commit |
 
 `sunder` names two environment-specific steps without binding them to any skill. In this
@@ -135,4 +135,5 @@ or none at all**. The one exception is a box writeup: exactly one commit titled 
 - `faketime` for Kerberos skew works on impacket binaries but **not** through `uvx`
   (SIP strips `DYLD_INSERT_LIBRARIES` on re-exec) — for `nxc`, `sudo sntp -sS <dc>` instead.
 - Wordlists: `rockyou.txt` and SecLists are installed locally; `sshpass`, `hashcat`, `chisel`
-  come from the `Brewfile`.
+  come from the `Brewfile`. The `sunder-recon` fuzzing scripts read `$SECLISTS` — ask the user
+  for their SecLists checkout and `export SECLISTS=<path>`; never hardcode a path in a skill.

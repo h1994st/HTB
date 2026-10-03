@@ -20,6 +20,37 @@ Two more steps — **bootstrap** and **report** — are environment-specific by 
 workspace lays out a target's files and how it records the result differ per project. The
 project's own instructions name the skills that fill those two slots.
 
+## First moves
+
+Every target starts the same way, in order — do not skip ahead to exploitation:
+
+1. **Bootstrap** the working directory and its two living artifacts (`ledger.md`,
+   `hypotheses.md`).
+2. **Recon** with `sunder-recon` — gather before you theorise.
+3. **Model and rank — this is a gate, not a formality.** Fill the *Surface & boundaries*
+   preamble of `hypotheses.md` (what the target is *about*; each trust boundary and the
+   cheapest question that settles it), then write **hypotheses Round 1**: a *ranked set*,
+   each with a **kill criterion**. Open a `TaskCreate` per lead. **Do not run an exploitation
+   probe until that ranked set exists and both artifacts are started** — a probe whose result
+   has no ranked candidate to land against is premature.
+4. **Only then act** — cheapest discriminating test first, re-ranking after every result.
+
+You are the **coordinator from move one**: you own the two artifacts, the ranked set, and the
+single target channel. *Dispatching workers* is the part that is adaptive (see *Operating
+model*); running the loop **as** the coordinator is not optional.
+
+## Drift signals
+
+These thoughts mean stop — you are drifting off the method:
+
+| Thought | Stop — instead |
+|---|---|
+| "Let me just probe this one thing first." | A probe without a ranked hypothesis set is chasing output. Write the set and its kill criteria first. |
+| "I'll fill the ledger / hypotheses later." | The artifacts are move-one, not cleanup. If a result has no ranked candidate to land against, the probe was premature. |
+| "This new output is interesting — follow it." | Re-rank, don't chase. Fold it into the ranked set *before* choosing the next action. |
+| "I'll keep driving this myself." (deep in heavy validation) | Heavy, parallelisable, or stalled validation → dispatch a worker; keep the coordinator's context lean. |
+| "The sweep found nothing." / "Nothing called back." | Inference from absence — mark it provisional and re-test with another oracle, especially on an unstable target. |
+
 ## The method
 
 Every step runs the same loop. Recon, foothold and escalation differ in subject matter, not
@@ -70,7 +101,7 @@ flowchart TD
     end
 
     subgraph SENSE["2. Make sense - gated on having enough facts"]
-        model["threat model<br/>assets, principals, boundaries"]
+        model["surface map<br/>theme · boundaries · cheapest Qs<br/>(preamble of hypotheses.md)"]
         research["sunder-vuln-research<br/>exploit-path vs usage-path"]
         hypo["hypotheses<br/>ranked candidates, kill criteria"]
     end
@@ -103,15 +134,16 @@ flowchart TD
     escalate -.-> report
 ```
 
-**Bootstrap** — the working directory and the three artifacts, however this environment
+**Bootstrap** — the working directory and the two artifacts, however this environment
 lays them out.
 
 **Gather** — `sunder-recon` from outside; the host sweep below once inside. Both answer the
 same question from different positions.
 
-**Make sense** — the threat model and the hypothesis set, both described under *Artifacts*.
-Component-level vulnerability assessment goes to `sunder-vuln-research`, which dispatches a
-subagent per component so the research does not consume this context.
+**Make sense** — the surface map and the hypothesis set, now a single artifact (`hypotheses.md`)
+described under *Artifacts*. Component-level vulnerability assessment goes to
+`sunder-vuln-research`, which dispatches a subagent per component so the research does not
+consume this context.
 
 **Act** — foothold and escalation, below.
 
@@ -224,9 +256,9 @@ credentials, and sweep again.
 
 ## Artifacts
 
-Three files in the working directory, created at bootstrap, written to as work happens.
-**All three are living documents — a new finding revises them, and a pivot can invalidate
-them wholesale.** A threat model or hypothesis set that never changes is not being used.
+Two files in the working directory, created at bootstrap, written to as work happens.
+**Both are living documents — a new finding revises them, and a pivot can invalidate them
+wholesale.** A hypothesis set that never changes is not being used.
 
 **`ledger.md` — shared state.** The user reads and writes it too, so it is how you stay in
 sync, and it is what survives a reset, a compaction, or a new session days later. Status,
@@ -235,23 +267,25 @@ leads with kill criteria, dead branches with the evidence that killed them, prov
 results, timeline. Append and supersede; never delete. A fact that cost effort goes in the
 moment it is obtained.
 
-**`threat-model.md` — the structure.** Assets worth reaching and what stands between you and
-each; every principal the system defines and the credential material it must hold; trust
-boundaries where data crosses into something more privileged; inputs the system parses,
-renders, deserializes, executes, schedules or fetches, and which you can influence — including
-those arriving on a timer rather than a request; and, on an authored target, what it is
-*about* — themed names, odd components and deliberately old versions are the author telling
-you the topic. Mark every line **observed** or **assumed**; assumptions inherited from a
-familiar-looking stack are what quietly misdirect a session. Each boundary converts into the
-cheapest question that settles it, and those questions are what gathering should answer.
+**`hypotheses.md` — the surface map and the candidates.** It opens with a short **Surface &
+boundaries** preamble, then the ranked candidate rounds.
 
-**`hypotheses.md` — the candidates.** Work in rounds, recording the facts reasoned from *and
-the notable gaps*. Force variety: one candidate per trust boundary, one for the component
-nobody has explained, one for the fact nothing accounts for, one for what the theme implies,
-and the mundane option — a credential, a reused password, a readable file — which is
-frequently right and gets skipped as too boring. Include at least one that contradicts the
-current working assumption; if every candidate shares a premise, test the premise first. Each
-round closes with every candidate confirmed, killed with evidence, or untested with a reason.
+The preamble is the system model, kept to what directs the next hour: what the target is
+*about* (themed names, odd components and deliberately old versions are the author naming the
+topic), and each **trust boundary** where data crosses into something more privileged — every
+input the system parses, renders, deserializes, executes, schedules or fetches and that you
+can influence, including those arriving on a timer rather than a request — each converted into
+*the cheapest question that settles it*. Those questions are what recon answers and what seed
+the rounds. Mark each line **observed** or **assumed**; assumptions inherited from a
+familiar-looking stack are what quietly misdirect a session.
+
+The candidates are worked in rounds, recording the facts reasoned from *and the notable gaps*.
+Force variety: one candidate per trust boundary, one for the component nobody has explained,
+one for the fact nothing accounts for, one for what the theme implies, and the mundane option
+— a credential, a reused password, a readable file — which is frequently right and gets
+skipped as too boring. Include at least one that contradicts the current working assumption;
+if every candidate shares a premise, test the premise first. Each round closes with every
+candidate confirmed, killed with evidence, or untested with a reason.
 
 ## Operating model — coordinator & workers
 
@@ -259,7 +293,13 @@ Run the loop as a **coordinator** dispatching **workers**, so validation noise n
 hypothesis discipline. The failure it prevents is one agent doing both jobs — letting the newest
 tool output pick the next move while raw dumps crowd out the ranked set.
 
-**Coordinator** (you). Owns the ranked hypothesis set, the three artifacts, and the single
+Separate the two things this blends. **Always-on, from move one:** you *are* the coordinator —
+you own the ranked hypothesis set, the two artifacts, and the single target channel, and you
+keep the hypothesis discipline on every step. That is not deferrable, and it holds even when
+you never spawn a single worker. **Adaptive:** *whether you dispatch workers* — drive cheap
+steps yourself, spin up workers only when validation is heavy, parallelisable, or stalled.
+
+**Coordinator** (you). Owns the ranked hypothesis set, the two artifacts, and the single
 target channel/state, and is the only voice to the user. Takes **verdicts, not transcripts**
 back, so its context stays lean enough to re-rank after every result.
 
@@ -275,9 +315,8 @@ dumps stay in its throwaway context. Two classes, opposite rules:
   channel: a fan-out divides the request budget rather than lifting it, and concurrent probes
   knock a small host over and manufacture false negatives across every branch at once.
 
-Adaptive: drive cheap steps yourself; spin up workers when validation is heavy, parallelizable,
-or the loop has stalled — **ask the user before a large fan-out**. Set each dispatch's task
-`owner` so it is visible, and fold every verdict into `hypotheses.md`.
+**Ask the user before a large fan-out.** Set each dispatch's task `owner` so it is visible, and
+fold every verdict into `hypotheses.md`.
 
 ## Tracking
 

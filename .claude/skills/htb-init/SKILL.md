@@ -20,10 +20,11 @@ machine name. If the IP is not known yet, omit it and fill in `TARGET_IP` later.
   every vhost discovered later to the same line.
 - Get the attacker IP for payloads and listeners from `common.get_openvpn_utun_ip()` — never
   hardcode it, it changes with each VPN session.
-- Three working-dir artifacts are created for you, and all three are meant to be filled in
-  rather than admired: `ledger.md` (shared state — status, access, credentials, services,
-  open leads, dead branches, timeline), `threat-model.md`, and `hypotheses.md`. The ledger is
-  the one the user reads and writes alongside you; fill in its **Status** before scanning.
+- Two working-dir artifacts are created for you, and both are meant to be filled in rather
+  than admired: `ledger.md` (shared state — status, access, credentials, services, open
+  leads, dead branches, timeline) and `hypotheses.md` (which opens with a *Surface &
+  boundaries* map that seeds the ranked hypothesis rounds). The ledger is the one the user
+  reads and writes alongside you; fill in its **Status** before scanning.
 
 ## Conventions this sets up
 
