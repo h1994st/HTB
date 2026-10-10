@@ -16,8 +16,9 @@
 
 const PANE_ID = 'sunder'
 const GATE_OPEN = /sunder:gate\s+ranked-set=complete/i // NB: won't match "...=incomplete"
-const MAX_CHARS = 6000 // chars read from each artifact before flattening
-const MAX_LINES = 400 // cap on pane lines rendered (the pane scrolls)
+const MAX_CHARS = 40000 // chars read from each artifact (full content for a normal box)
+const MAX_LINES = 1500 // safety cap on rendered pane lines (the pane scrolls)
+const REFRESH_MS = 2000 // poll a pane repaint so file edits show up live
 
 // Analysis workers (reading, research, planning) build the model during sense-making and are
 // fanned out in parallel BEFORE the ranked set exists — the method relies on that, so they are
@@ -98,7 +99,9 @@ async function activeBox($) {
 const rankedSetDeclared = async ($, box) => GATE_OPEN.test(await slurp($, `${box}/hypotheses.md`))
 
 export function register(on) {
-  // --- Register the pane's open/hide slash commands --------------------------
+  let opened = false // the pane has been auto-opened once (so we don't fight a manual close)
+
+  // --- Register the open/hide commands + keep the pane live ------------------
   on('session.start', async ($, e, next) => {
     try {
       await $.command.register({
@@ -106,6 +109,19 @@ export function register(on) {
         description: 'Open the sunder pane (phase · hypotheses · ledger)',
       })
       await $.command.register({ name: 'sunder-pane-hide', description: 'Hide the sunder pane' })
+      // The render reads the artifact files directly, so the engine never learns they
+      // changed — poll a repaint on a timer so edits (new rounds, ledger lines) show up.
+      $.clock.every(REFRESH_MS, () => {
+        try {
+          $.ui.invalidate('ui.render')
+        } catch {
+          /* */
+        }
+      })
+      if (await activeBox($)) {
+        await $.ui.open({ id: PANE_ID, title: 'sunder', closeOnEscape: true })
+        opened = true
+      }
     } catch {
       /* ignore */
     }
@@ -149,19 +165,12 @@ export function register(on) {
   })
 
   // --- Pane: live view of the engagement, read from the artifacts ------------
-  let started = false
+  // Fallback: open the pane the first turn a box becomes active mid-session.
   on('turn.start', async ($, e, next) => {
     try {
-      if (!started && (await activeBox($))) {
-        started = true
+      if (!opened && (await activeBox($))) {
+        opened = true
         await $.ui.open({ id: PANE_ID, title: 'sunder', closeOnEscape: true })
-        $.clock.every(2000, () => {
-          try {
-            $.ui.invalidate('ui.render')
-          } catch {
-            /* */
-          }
-        })
       }
     } catch {
       /* ignore */
