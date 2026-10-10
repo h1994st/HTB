@@ -100,6 +100,7 @@ const rankedSetDeclared = async ($, box) => GATE_OPEN.test(await slurp($, `${box
 
 export function register(on) {
   let opened = false // the pane has been auto-opened once (so we don't fight a manual close)
+  let lastSig = '' // last-seen (box, hypotheses mtime, ledger mtime) — the poll repaints only on change
 
   // --- Register the open/hide commands + keep the pane live ------------------
   on('session.start', async ($, e, next) => {
@@ -110,13 +111,26 @@ export function register(on) {
       })
       await $.command.register({ name: 'sunder-pane-hide', description: 'Hide the sunder pane' })
       // The render reads the artifact files directly, so the engine never learns they
-      // changed — poll a repaint on a timer so edits (new rounds, ledger lines) show up.
+      // changed. Claude's own edits repaint instantly via the tool.call hook below; this
+      // poll is the catch-all for edits made OUTSIDE Claude's tools (you editing the ledger
+      // in your own editor). It stats the two artifacts and repaints only when an mtime
+      // actually changed, so a quiet tick costs two stat calls, not a redraw.
       $.clock.every(REFRESH_MS, () => {
-        try {
-          $.ui.invalidate('ui.render')
-        } catch {
-          /* */
-        }
+        void (async () => {
+          try {
+            const box = await activeBox($)
+            if (!box) return
+            const h = await $.fs.stat(`${box}/hypotheses.md`).catch(() => null)
+            const l = await $.fs.stat(`${box}/ledger.md`).catch(() => null)
+            const sig = `${box}|${h && h.mtimeMs}|${l && l.mtimeMs}`
+            if (sig !== lastSig) {
+              lastSig = sig
+              $.ui.invalidate('ui.render')
+            }
+          } catch {
+            /* */
+          }
+        })()
       })
       if (await activeBox($)) {
         await $.ui.open({ id: PANE_ID, title: 'sunder', closeOnEscape: true })
@@ -229,5 +243,18 @@ export function register(on) {
       /* ignore */
     }
     return { text: 'sunder pane hidden — reopen it with /sunder-pane-show.' }
+  })
+
+  // Event-driven refresh: when Claude writes/edits an artifact, repaint at once instead of
+  // waiting on the poll above. (Manual edits in another editor still rely on that poll.)
+  on('tool.call', { tool: ['Write', 'Edit', 'MultiEdit'] }, async ($, e, next) => {
+    const result = await next(e)
+    try {
+      const path = String(e.file_path ?? (e.input && e.input.file_path) ?? '')
+      if (/\/(hypotheses|ledger)\.md$/.test(path)) $.ui.invalidate('ui.render')
+    } catch {
+      /* */
+    }
+    return result
   })
 }
