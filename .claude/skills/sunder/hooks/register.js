@@ -16,12 +16,38 @@
 
 const PANE_ID = 'sunder'
 const GATE_OPEN = /sunder:gate\s+ranked-set=complete/i // NB: won't match "...=incomplete"
-const MAX = 4000 // chars of each artifact to show in the pane
+const MAX_CHARS = 6000 // chars read from each artifact before flattening
+const MAX_LINES = 400 // cap on pane lines rendered (the pane scrolls)
 
 // Analysis workers (reading, research, planning) build the model during sense-making and are
 // fanned out in parallel BEFORE the ranked set exists — the method relies on that, so they are
 // never gated. Only lead-pursuit / target-action dispatch waits for the ranked set.
 const ANALYSIS_AGENT = /(^|:)(cve-researcher|explore|plan)$/i
+
+// Markdown tables wreck a narrow pane (they draw as grids that overflow), so collapse each
+// table to one bullet line per data row ("cell · cell · …"), dropping the header + separator,
+// and leave every other line as-is. The caller renders each line as a width-truncated Text.
+function flattenTables(md) {
+  const lines = md.split('\n')
+  const out = []
+  const isRow = (l) => /^\s*\|.*\|\s*$/.test(l)
+  const isSep = (l) => /^\s*\|?[\s:|-]*-{3,}[\s:|-]*\|?\s*$/.test(l)
+  const cells = (l) => l.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map((c) => c.trim())
+  for (let i = 0; i < lines.length; ) {
+    if (isRow(lines[i]) && i + 1 < lines.length && isSep(lines[i + 1])) {
+      i += 2 // drop header row + separator
+      while (i < lines.length && isRow(lines[i])) {
+        const c = cells(lines[i]).filter((x) => x && !/^:?-+:?$/.test(x))
+        if (c.length) out.push('- ' + c.join(' · '))
+        i++
+      }
+    } else {
+      out.push(lines[i])
+      i++
+    }
+  }
+  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim()
+}
 
 // Mods API call-site rule: $ is always spelled $.noun.event(...). $.session.root()/cwd()
 // are methods; which one a build exposes can vary, so try root first, then cwd.
@@ -129,28 +155,37 @@ export function register(on) {
     return next(e)
   })
 
-  on('ui.render', { component: 'Pane' }, async ($, e, next) => {
-    if (e.requestId !== PANE_ID) return next(e)
+  on('ui.render', { component: 'Pane', requestId: PANE_ID }, async ($, e) => {
+    const { Box, Text } = $.ui.resolve(e)
     try {
-      const { Box, Text, Markdown } = $.ui.resolve(e)
       const box = await activeBox($)
       if (!box) {
-        return Box({ children: [Text({ children: ['no active sunder engagement (no */hypotheses.md)'] })] })
+        return Box({ children: [Text({ children: ['no active sunder engagement (no */hypotheses.md)'], dimColor: true })] })
       }
       const name = box.split('/').pop()
-      const phase = (await rankedSetDeclared($, box)) ? 'ENGAGED · gate open' : 'RECON · gate closed'
-      const hyp = (await slurp($, `${box}/hypotheses.md`)).slice(0, MAX)
-      const led = (await slurp($, `${box}/ledger.md`)).slice(0, MAX)
+      const open = await rankedSetDeclared($, box)
+      const lines = [
+        ...flattenTables((await slurp($, `${box}/hypotheses.md`)).slice(0, MAX_CHARS)).split('\n'),
+        '',
+        '════════ ledger ════════',
+        '',
+        ...flattenTables((await slurp($, `${box}/ledger.md`)).slice(0, MAX_CHARS)).split('\n'),
+      ].slice(0, MAX_LINES)
+      // Every line is a width-truncated Text so nothing overflows; headings render bold.
       return Box({
         flexDirection: 'column',
         children: [
-          Text({ children: [`${name} — ${phase}`], bold: true }),
-          Markdown({ text: `## hypotheses\n\n${hyp || '_empty_'}` }),
-          Markdown({ text: `## ledger\n\n${led || '_empty_'}` }),
+          Text({ children: [`${name} — ${open ? 'ENGAGED · gate open' : 'RECON · gate closed'}`], bold: true, wrap: 'truncate-end' }),
+          ...lines.map((l) => {
+            const h = /^\s*#{1,6}\s+(.*\S)/.exec(l)
+            return h
+              ? Text({ children: [h[1]], bold: true, wrap: 'truncate-end' })
+              : Text({ children: [l === '' ? ' ' : l], wrap: 'truncate-end' })
+          }),
         ],
       })
     } catch {
-      return next(e) // on any render error, let Claude Code draw its default
+      return Box({ children: [Text({ children: ['sunder pane: render error'], dimColor: true })] })
     }
   })
 }
