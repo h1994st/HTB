@@ -185,16 +185,16 @@ export function register(on) {
         '',
         ...flattenTables((await slurp($, `${box}/ledger.md`)).slice(0, MAX_CHARS)).split('\n'),
       ].slice(0, MAX_LINES)
-      // Every line is a width-truncated Text so nothing overflows; headings render bold.
+      // Each line wraps to the pane width (reflows on resize); headings render bold.
       return Box({
         flexDirection: 'column',
         children: [
-          Text({ children: [`${name} — ${open ? 'ENGAGED · gate open' : 'RECON · gate closed'}`], bold: true, wrap: 'truncate-end' }),
+          Text({ children: [`${name} — ${open ? 'ENGAGED · gate open' : 'RECON · gate closed'}`], bold: true, wrap: 'wrap' }),
           ...lines.map((l) => {
             const h = /^\s*#{1,6}\s+(.*\S)/.exec(l)
             return h
-              ? Text({ children: [h[1]], bold: true, wrap: 'truncate-end' })
-              : Text({ children: [l === '' ? ' ' : l], wrap: 'truncate-end' })
+              ? Text({ children: [h[1]], bold: true, wrap: 'wrap' })
+              : Text({ children: [l === '' ? ' ' : l], wrap: 'wrap' })
           }),
         ],
       })
