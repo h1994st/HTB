@@ -98,6 +98,20 @@ async function activeBox($) {
 const rankedSetDeclared = async ($, box) => GATE_OPEN.test(await slurp($, `${box}/hypotheses.md`))
 
 export function register(on) {
+  // --- Register the pane's open/hide slash commands --------------------------
+  on('session.start', async ($, e, next) => {
+    try {
+      await $.command.register({
+        name: 'sunder-pane-show',
+        description: 'Open the sunder pane (phase · hypotheses · ledger)',
+      })
+      await $.command.register({ name: 'sunder-pane-hide', description: 'Hide the sunder pane' })
+    } catch {
+      /* ignore */
+    }
+    return next(e)
+  })
+
   // --- Gate: no lead dispatched before the ranked set is declared ------------
   on('agent.spawn', async ($, e, next) => {
     try {
@@ -187,5 +201,24 @@ export function register(on) {
     } catch {
       return Box({ children: [Text({ children: ['sunder pane: render error'], dimColor: true })] })
     }
+  })
+
+  // --- Open / hide the pane by hand (reopen it after an accidental close) -----
+  on('command.run', { command: 'sunder-pane-show' }, async ($) => {
+    try {
+      await $.ui.open({ id: PANE_ID, title: 'sunder', closeOnEscape: true })
+    } catch {
+      /* ignore */
+    }
+    return { text: 'sunder pane opened.' }
+  })
+
+  on('command.run', { command: 'sunder-pane-hide' }, async ($) => {
+    try {
+      await $.ui.close({ id: PANE_ID })
+    } catch {
+      /* ignore */
+    }
+    return { text: 'sunder pane hidden — reopen it with /sunder-pane-show.' }
   })
 }

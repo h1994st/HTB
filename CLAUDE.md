@@ -36,7 +36,7 @@ names are namespaced `sunder:*`:
 | skill | `sunder:sunder-recon` | surface discovery and version fingerprinting |
 | skill | `sunder:sunder-vuln-research` | per-component assessment, delegated to a subagent to keep the reading out of context |
 | agent | `sunder:cve-researcher` | research subagent for one component at one version |
-| mod | (automatic) | **first-moves gate** — denies lead-pursuit `agent.spawn` (analysis workers like `sunder:cve-researcher`/`Explore` exempt) until the active `hypotheses.md` has a ranked set (its `sunder:gate` marker flipped to complete) — plus a live **pane** showing phase · hypotheses · ledger |
+| mod | (automatic) | **first-moves gate** — denies lead-pursuit `agent.spawn` (analysis workers like `sunder:cve-researcher`/`Explore` exempt) until the active `hypotheses.md` has a ranked set (its `sunder:gate` marker flipped to complete) — plus a live **pane** showing phase · hypotheses · ledger (open/hide with `/sunder-pane-show` · `/sunder-pane-hide`) |
 
 The `htb-*` skills are how *this workspace* sets up and records a machine; they stay as loose
 project skills under their bare names:
