@@ -1,5 +1,9 @@
 # __BOX_NAME__ — hypotheses
 
+<!-- sunder:gate ranked-set=incomplete -->
+<!-- First-moves gate (sunder mod): worker dispatch stays blocked until the marker above is
+     flipped from incomplete to complete. Flip it once Round 1 below holds a ranked candidate set. -->
+
 Competing explanations for how the intended path works, written down so they can be ranked,
 tested, and killed explicitly rather than drifted between. Add the phase and date each set
 was generated for; keep superseded sets rather than deleting them.

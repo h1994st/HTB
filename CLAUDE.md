@@ -19,27 +19,35 @@ how each was killed). The notebook is the distilled, re-runnable writeup.
 
 ## Skills
 
-Invoke **`sunder`** at the start of every box. It is the method — the
+Invoke **`sunder:sunder`** at the start of every box. It is the method — the
 hypothesis/validate/adjust loop every step runs, the steps from recon to root, the working
 artifacts, the stuck protocol, and the rules of engagement. General guidance lives there and
 nowhere else.
 
-The skill set splits by scope. `sunder*` skills are general offensive-security method and
-carry nothing HTB-specific; `htb-*` skills are how *this workspace* sets up and records a
-machine:
+The method ships as one self-contained, repo-local **plugin** at `.claude/skills/sunder/`. It
+auto-loads as `sunder@skills-dir` when a session starts from the repo root and the folder is
+trusted — no install, no marketplace, no `--plugin-dir`. It bundles the three `sunder` skills,
+the `cve-researcher` agent, and a **mod** (`hooks/register.js`). Being plugin components, their
+names are namespaced `sunder:*`:
 
-| Skill | Scope | Does |
+| Component | Invoke as | Does |
 |---|---|---|
-| `sunder` | general | the method, the steps, the artifacts, the rules of engagement |
-| `sunder-recon` | general | surface discovery and version fingerprinting |
-| `sunder-vuln-research` | general | per-component assessment, delegated to a subagent to keep the reading out of context |
-| `htb-init` | HTB | bootstraps the working dir, the two artifacts, and the notebook (owns the templates) |
-| `htb-writeup` | HTB | notebook assembly and the `HTB: BoxName` commit |
+| skill | `sunder:sunder` | the method, the steps, the artifacts, the rules of engagement |
+| skill | `sunder:sunder-recon` | surface discovery and version fingerprinting |
+| skill | `sunder:sunder-vuln-research` | per-component assessment, delegated to a subagent to keep the reading out of context |
+| agent | `sunder:cve-researcher` | research subagent for one component at one version |
+| mod | (automatic) | **first-moves gate** — denies lead-pursuit `agent.spawn` (analysis workers like `sunder:cve-researcher`/`Explore` exempt) until the active `hypotheses.md` has a ranked set (its `sunder:gate` marker flipped to complete) — plus a live **pane** showing phase · hypotheses · ledger |
 
-`sunder` names two environment-specific steps without binding them to any skill. In this
-repo they bind as: **bootstrap** → `htb-init`, **report** → `htb-writeup`.
+The `htb-*` skills are how *this workspace* sets up and records a machine; they stay as loose
+project skills under their bare names:
 
-`.claude/agents/cve-researcher.md` is a research subagent for one component at one version.
+| Skill | Does |
+|---|---|
+| `htb-init` | bootstraps the working dir, the two artifacts, and the notebook (owns the templates) |
+| `htb-writeup` | notebook assembly and the `HTB: BoxName` commit |
+
+`sunder` names two environment-specific steps without binding them to any skill. In this repo
+they bind as: **bootstrap** → `htb-init`, **report** → `htb-writeup`.
 
 ## Commands
 

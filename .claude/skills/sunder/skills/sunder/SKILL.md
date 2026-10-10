@@ -32,7 +32,9 @@ Every target starts the same way, in order — do not skip ahead to exploitation
    cheapest question that settles it), then write **hypotheses Round 1**: a *ranked set*,
    each with a **kill criterion**. Open a `TaskCreate` per lead. **Do not run an exploitation
    probe until that ranked set exists and both artifacts are started** — a probe whose result
-   has no ranked candidate to land against is premature.
+   has no ranked candidate to land against is premature. When the ranked set is down, flip the
+   `sunder:gate` marker at the top of `hypotheses.md` to complete; where a mod enforces this,
+   lead-pursuit worker dispatch stays blocked until you do (analysis/research workers excepted).
 4. **Only then act** — cheapest discriminating test first, re-ranking after every result.
 
 You are the **coordinator from move one**: you own the two artifacts, the ranked set, and the

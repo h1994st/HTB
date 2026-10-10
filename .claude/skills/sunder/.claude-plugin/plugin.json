@@ -1,0 +1,7 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "sunder",
+  "version": "0.1.0",
+  "description": "The sunder offensive-security method as one self-contained unit: the method skills (sunder, recon, vuln-research), the cve-researcher agent, and a mod that gates worker dispatch on a ranked hypothesis set and surfaces live state (phase, hypotheses, ledger) in a pane.",
+  "author": { "name": "h1994st" }
+}
