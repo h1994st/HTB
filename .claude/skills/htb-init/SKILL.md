@@ -20,11 +20,18 @@ machine name. If the IP is not known yet, omit it and fill in `TARGET_IP` later.
   every vhost discovered later to the same line.
 - Get the attacker IP for payloads and listeners from `common.get_openvpn_utun_ip()` — never
   hardcode it, it changes with each VPN session.
-- Two working-dir artifacts are created for you, and both are meant to be filled in rather
-  than admired: `ledger.md` (shared state — status, access, credentials, services, open
-  leads, dead branches, timeline) and `hypotheses.md` (which opens with a *Surface &
-  boundaries* map that seeds the ranked hypothesis rounds). The ledger is the one the user
-  reads and writes alongside you; fill in its **Status** before scanning.
+- The box's shared state lives in the **sunder engagement store**, not in hand-written files.
+  Once the working dir exists, start it with the sunder `init` MCP tool —
+  `init(box_dir="<host>", target="<ip-or-host>")` — which creates `<host>/sunder.db` and
+  renders `ledger.md` and `hypotheses.md` into the working dir (`ledger.md` = shared state;
+  `hypotheses.md` opens with the *Surface & boundaries* map that seeds the ranked rounds).
+  **Both files are regenerated on every store write — never hand-edit them:** record facts,
+  hypotheses, and results through the `sunder:*` tools. The user reads them and writes notes
+  or steers only between the `<!-- sunder:human:begin -->` and `<!-- sunder:human:end -->`
+  markers in `ledger.md`; that region survives re-renders and the agent reads it. The plugin
+  also ships a `sunder` CLI (run against its project root,
+  `uv run --project <sunder-plugin-root> sunder …`): `note` adds a human note, `state` prints
+  JSON, `render` regenerates the two files, and `export` writes `attack-path.md` for the writeup.
 
 ## Conventions this sets up
 

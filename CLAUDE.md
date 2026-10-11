@@ -12,10 +12,13 @@ A personal Hack The Box workspace. Each machine produces **two** artifacts:
 | Working directory | `boxname.htb/` (lowercase) | **no** — `.gitignore` has `*.htb/` |
 
 Everything volatile (scans, loot, exploit scripts, keys, flags) lives in the working
-directory, alongside two artifacts created at bootstrap and maintained while the box is in
-progress: `ledger.md` (shared state — the user reads and writes it too) and `hypotheses.md`
-(which opens with a *Surface & boundaries* system model, then the competing candidates and
-how each was killed). The notebook is the distilled, re-runnable writeup.
+directory, alongside the **sunder engagement store** (`boxname.htb/sunder.db`) and its two
+**renders**: `ledger.md` (shared state) and `hypotheses.md` (a *Surface & boundaries* system
+model, then the competing candidates and how each was killed). The agent writes the store
+through the `sunder:*` MCP tools and both files are regenerated on every write — never
+hand-edit them; the user reads them and writes notes or steers only inside the `sunder:human`
+region of `ledger.md`, which survives re-renders. The notebook is the distilled, re-runnable
+writeup.
 
 ## Skills
 
