@@ -24,11 +24,12 @@ hypothesis/validate/adjust loop every step runs, the steps from recon to root, t
 artifacts, the stuck protocol, and the rules of engagement. General guidance lives there and
 nowhere else.
 
-The method ships as one self-contained, repo-local **plugin** at `.claude/skills/sunder/`. It
-auto-loads as `sunder@skills-dir` when a session starts from the repo root and the folder is
-trusted — no install, no marketplace, no `--plugin-dir`. It bundles the three `sunder` skills,
-the `cve-researcher` agent, and a **mod** (`hooks/register.js`). Being plugin components, their
-names are namespaced `sunder:*`:
+The method lives in **its own plugin repo** and installs as a **user-scope plugin** from a
+local marketplace (`sunder@sunder`), so it is shared across every workspace rather than bundled
+in this repo — it is no longer a repo-local `skills-dir` plugin. It provides the three `sunder`
+skills, the `cve-researcher` agent, a **graph-store MCP** (a SQLite engagement graph with
+first-class hypotheses and gap rules), and an enforcement **mod**. Being plugin components,
+their names are namespaced `sunder:*`:
 
 | Component | Invoke as | Does |
 |---|---|---|
@@ -36,7 +37,8 @@ names are namespaced `sunder:*`:
 | skill | `sunder:sunder-recon` | surface discovery and version fingerprinting |
 | skill | `sunder:sunder-vuln-research` | per-component assessment, delegated to a subagent to keep the reading out of context |
 | agent | `sunder:cve-researcher` | research subagent for one component at one version |
-| mod | (automatic) | **first-moves gate** — denies lead-pursuit `agent.spawn` (analysis workers like `sunder:cve-researcher`/`Explore` exempt) until the active `hypotheses.md` has a ranked set (its `sunder:gate` marker flipped to complete) — plus a live **pane** showing phase · hypotheses · ledger (open/hide with `/sunder-pane-show` · `/sunder-pane-hide`) |
+| MCP | `sunder` store | the SQLite engagement graph — `init`/`observe`/`hypothesize`/`record`/`state`; nodes and edges carry hypotheses, and `ledger.md`/`hypotheses.md` are renders of it (only the `sunder:human` region is free text) |
+| mod | (automatic) | gates lead-pursuit `agent.spawn` on a **complete ranked set** (analysis workers like `sunder:cve-researcher`/`Explore` exempt) and shows live state in a **pane** (open/hide with `/sunder-pane-show` · `/sunder-pane-hide`) |
 
 The `htb-*` skills are how *this workspace* sets up and records a machine; they stay as loose
 project skills under their bare names:
